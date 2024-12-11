@@ -2,17 +2,18 @@
 using FluentValidation;
 using QueryRulesEngine.Entities;
 using QueryRulesEngine.Persistence;
+using QueryRulesEngine.Repositories;
 
 namespace ApprovalHierarchyManager.Application.Features.ApprovalHierarchy.CreateHierarchy.Validators;
 
-public sealed class CreateHierarchyValidator
-    : AbstractValidator<CreateHierarchyRequest>
-{
-    private readonly IReadOnlyRepositoryAsync<int> _readOnlyRepository;
 
-    public CreateHierarchyValidator(IReadOnlyRepositoryAsync<int> readOnlyRepository)
+public sealed class CreateHierarchyValidator : AbstractValidator<CreateHierarchyRequest>
+{
+    private readonly IHierarchyRepository _repository;
+
+    public CreateHierarchyValidator(IHierarchyRepository repository)
     {
-        _readOnlyRepository = readOnlyRepository;
+        _repository = repository;
 
         RuleFor(x => x.Name)
             .NotEmpty()
@@ -26,10 +27,5 @@ public sealed class CreateHierarchyValidator
     }
 
     private async Task<bool> BeUniqueName(string name, CancellationToken cancellationToken)
-    {
-        return !(await _readOnlyRepository.FindByPredicateAndTransformAsync<Hierarchy, bool>(
-            h => h.Name == name,
-            h => true,
-            cancellationToken));
-    }
+        => await _repository.IsUniqueHierarchyNameAsync(name, cancellationToken);
 }

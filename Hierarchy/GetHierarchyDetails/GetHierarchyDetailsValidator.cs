@@ -3,25 +3,21 @@ using QueryRulesEngine.Persistence;
 using QueryRulesEngine.Entities;
 using System.Threading;
 using System.Threading.Tasks;
+using QueryRulesEngine.Repositories;
 
 public sealed class GetHierarchyDetailsValidator : AbstractValidator<GetHierarchyDetailsRequest>
 {
-    private readonly IReadOnlyRepositoryAsync<int> _readOnlyRepository;
+    private readonly IHierarchyRepository _repository;
 
-    public GetHierarchyDetailsValidator(IReadOnlyRepositoryAsync<int> readOnlyRepository)
+    public GetHierarchyDetailsValidator(IHierarchyRepository repository)
     {
-        _readOnlyRepository = readOnlyRepository;
+        _repository = repository;
 
         RuleFor(x => x.HierarchyId)
-            .MustAsync(HierarchyExists)
+            .MustAsync(HierarchyExistsAsync)
             .WithMessage("Hierarchy does not exist.");
     }
 
-    private async Task<bool> HierarchyExists(int hierarchyId, CancellationToken cancellationToken)
-    {
-        return await _readOnlyRepository.FindByPredicateAndTransformAsync<Hierarchy, bool>(
-            h => h.Id == hierarchyId,
-            h => true,
-            cancellationToken);
-    }
+    private async Task<bool> HierarchyExistsAsync(int hierarchyId, CancellationToken cancellationToken)
+        => await _repository.HierarchyExistsAsync(hierarchyId, cancellationToken);
 }

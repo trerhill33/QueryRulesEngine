@@ -1,16 +1,15 @@
 ﻿using FluentValidation;
-using QueryRulesEngine.Entities;
-using QueryRulesEngine.Persistence;
+using QueryRulesEngine.Repositories;
 
 namespace QueryRulesEngine.Rules.AddRuleToLevel
 {
     public sealed class AddRuleToLevelValidator : AbstractValidator<AddRuleToLevelRequest>
     {
-        private readonly IReadOnlyRepositoryAsync<int> _readOnlyRepository;
+        private readonly IHierarchyRepository _repository;
 
-        public AddRuleToLevelValidator(IReadOnlyRepositoryAsync<int> readOnlyRepository)
+        public AddRuleToLevelValidator(IHierarchyRepository repository)
         {
-            _readOnlyRepository = readOnlyRepository;
+            _repository = repository;
             ConfigureValidationRules();
         }
 
@@ -36,38 +35,13 @@ namespace QueryRulesEngine.Rules.AddRuleToLevel
         }
 
         private async Task<bool> HierarchyExistsAsync(int hierarchyId, CancellationToken cancellationToken)
-        {
-            return await _readOnlyRepository.FindByPredicateAndTransformAsync<Hierarchy, bool>(
-                h => h.Id == hierarchyId,
-                h => true,
-                cancellationToken);
-        }
+            => await _repository.HierarchyExistsAsync(hierarchyId, cancellationToken);
 
-        private async Task<bool> LevelExistsAsync(
-            AddRuleToLevelRequest request,
-            int LevelNumber,
-            CancellationToken cancellationToken)
-        {
-            var levelKey = $"level.{LevelNumber}";
-            var exists = await _readOnlyRepository.FindByPredicateAndTransformAsync<MetadataKey, bool>(
-                mk => mk.HierarchyId == request.HierarchyId && mk.KeyName == levelKey,
-                mk => true,
-                cancellationToken);
-            return exists;
-        }
+        private async Task<bool> LevelExistsAsync(AddRuleToLevelRequest request, int levelNumber, CancellationToken cancellationToken)
+            => await _repository.LevelExistsAsync(request.HierarchyId, levelNumber, cancellationToken);
 
-        private async Task<bool> BeUniqueRuleNumberAsync(
-            AddRuleToLevelRequest request,
-            string RuleNumber,
-            CancellationToken cancellationToken)
-        {
-            var rules = await _readOnlyRepository.FindAllByPredicateAndTransformAsync<MetadataKey, string>(
-                mk => mk.HierarchyId == request.HierarchyId &&
-                      mk.KeyName.StartsWith($"level.{request.LevelNumber}.rule."),
-                mk => mk.KeyName,
-                cancellationToken);
+        private async Task<bool> BeUniqueRuleNumberAsync(AddRuleToLevelRequest request, string ruleNumber, CancellationToken cancellationToken)
+            => await _repository.IsUniqueRuleNumberAsync(request.HierarchyId, request.LevelNumber, ruleNumber, cancellationToken);
 
-            return !rules.Any(r => r.Contains(RuleNumber));
-        }
     }
 }

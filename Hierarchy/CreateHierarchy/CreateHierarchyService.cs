@@ -2,10 +2,6 @@
 using FluentValidation;
 using QueryRulesEngine.Entities;
 using QueryRulesEngine.Persistence;
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace QueryRulesEngine.Hierarchys.CreateHierarchy
 {
