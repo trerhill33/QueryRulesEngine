@@ -2,13 +2,14 @@
 using QueryRulesEngine.Entities;
 using QueryRulesEngine.Persistence;
 
-namespace QueryRulesEngine.Hierarchys.AddRuleToLevel
+namespace QueryRulesEngine.Rules.EditRule
 {
-    public sealed class AddRuleToLevelValidator : AbstractValidator<AddRuleToLevelRequest>
+
+    public sealed class EditRuleRequestValidator : AbstractValidator<EditRuleRequest>
     {
         private readonly IReadOnlyRepositoryAsync<int> _readOnlyRepository;
 
-        public AddRuleToLevelValidator(IReadOnlyRepositoryAsync<int> readOnlyRepository)
+        public EditRuleRequestValidator(IReadOnlyRepositoryAsync<int> readOnlyRepository)
         {
             _readOnlyRepository = readOnlyRepository;
             ConfigureValidationRules();
@@ -26,7 +27,7 @@ namespace QueryRulesEngine.Hierarchys.AddRuleToLevel
 
             RuleFor(x => x.RuleNumber)
                 .NotEmpty()
-                .WithMessage("Rule name is required.")
+                .WithMessage("Rule number is required.")
                 .MustAsync(BeUniqueRuleNumberAsync)
                 .WithMessage("A rule with this name already exists in the specified level.");
 
@@ -44,7 +45,7 @@ namespace QueryRulesEngine.Hierarchys.AddRuleToLevel
         }
 
         private async Task<bool> LevelExistsAsync(
-            AddRuleToLevelRequest request,
+            EditRuleRequest request,
             int LevelNumber,
             CancellationToken cancellationToken)
         {
@@ -57,7 +58,7 @@ namespace QueryRulesEngine.Hierarchys.AddRuleToLevel
         }
 
         private async Task<bool> BeUniqueRuleNumberAsync(
-            AddRuleToLevelRequest request,
+            EditRuleRequest request,
             string RuleNumber,
             CancellationToken cancellationToken)
         {

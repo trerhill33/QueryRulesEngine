@@ -5,7 +5,7 @@ using QueryRulesEngine.Persistence;
 using QueryRulesEngine.QueryEngine.Common.Models;
 using QueryRulesEngine.QueryEngine.Persistence;
 
-namespace QueryRulesEngine.Hierarchys.AddRuleToLevel
+namespace QueryRulesEngine.Rules.AddRuleToLevel
 {
     public sealed class AddRuleToLevelService : IAddRuleToLevelService
     {

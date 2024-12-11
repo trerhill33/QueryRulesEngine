@@ -1,6 +1,6 @@
 ﻿using QueryRulesEngine.Persistence;
 
-namespace QueryRulesEngine.Hierarchys.AddRuleToLevel
+namespace QueryRulesEngine.Rules.AddRuleToLevel
 {
     public interface IAddRuleToLevelService
     {
