@@ -1,6 +1,8 @@
-﻿namespace QueryRulesEngine.Entities
+﻿using QueryRulesEngine.Persistence;
+
+namespace QueryRulesEngine.Entities
 {
-    public class Metadata
+    public class Metadata : AuditableEntity<int>
     {
         public int HierarchyId { get; set; }
         public string ApproverId { get; set; }

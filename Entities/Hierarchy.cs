@@ -1,6 +1,8 @@
-﻿namespace QueryRulesEngine.Entities
+﻿using QueryRulesEngine.Persistence;
+
+namespace QueryRulesEngine.Entities
 {
-    public class Hierarchy
+    public class Hierarchy : AuditableEntity<int>
     {
         public string Name { get; set; }
         public string Description { get; set; }
