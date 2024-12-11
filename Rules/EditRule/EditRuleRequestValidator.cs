@@ -1,16 +1,21 @@
-﻿using FluentValidation;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using FluentValidation;
+using QueryRulesEngine.Entities;
+using QueryRulesEngine.Persistence;
 using QueryRulesEngine.Repositories;
 
 namespace QueryRulesEngine.Rules.EditRule
 {
-
     public sealed class EditRuleRequestValidator : AbstractValidator<EditRuleRequest>
     {
-        private readonly IHierarchyRepository _repository;
+        private readonly IHierarchyRepository _hierarchyRepository;
+        private readonly IMetadataKeyRepository _metadataKeyRepository;
 
-        public EditRuleRequestValidator(IHierarchyRepository repository)
+        public EditRuleRequestValidator(IHierarchyRepository hierarchyRepository, IMetadataKeyRepository metadataKeyRepository)
         {
-            _repository = repository;
+            _hierarchyRepository = hierarchyRepository;
+            _metadataKeyRepository = metadataKeyRepository;
             ConfigureValidationRules();
         }
 
@@ -35,13 +40,19 @@ namespace QueryRulesEngine.Rules.EditRule
                 .WithMessage("QueryMatrix is required.");
         }
 
-        private async Task<bool> HierarchyExistsAsync(int hierarchyId, CancellationToken cancellationToken) 
-            => await _repository.HierarchyExistsAsync(hierarchyId, cancellationToken);
+        private async Task<bool> HierarchyExistsAsync(int hierarchyId, CancellationToken cancellationToken)
+        {
+            return await _hierarchyRepository.HierarchyExistsAsync(hierarchyId, cancellationToken);
+        }
 
-        private async Task<bool> LevelExistsAsync(EditRuleRequest request, int levelNumber, CancellationToken cancellationToken) 
-            => await _repository.LevelExistsAsync(request.HierarchyId, levelNumber, cancellationToken);
+        private async Task<bool> LevelExistsAsync(EditRuleRequest request, int levelNumber, CancellationToken cancellationToken)
+        {
+            return await _hierarchyRepository.LevelExistsAsync(request.HierarchyId, levelNumber, cancellationToken);
+        }
 
         private async Task<bool> BeUniqueRuleNumberAsync(EditRuleRequest request, string ruleNumber, CancellationToken cancellationToken)
-            => await _repository.IsUniqueRuleNumberAsync(request.HierarchyId, request.LevelNumber, ruleNumber, cancellationToken);
+        {
+            return await _hierarchyRepository.IsUniqueRuleNumberAsync(request.HierarchyId, request.LevelNumber, ruleNumber, cancellationToken);
+        }
     }
 }

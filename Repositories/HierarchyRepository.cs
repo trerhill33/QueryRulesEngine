@@ -16,10 +16,7 @@ namespace QueryRulesEngine.Repositories
     {
         private readonly IReadOnlyRepositoryAsync<int> _readOnlyRepository;
 
-        public HierarchyRepository(IReadOnlyRepositoryAsync<int> readOnlyRepository)
-        {
-            _readOnlyRepository = readOnlyRepository;
-        }
+        public HierarchyRepository(IReadOnlyRepositoryAsync<int> readOnlyRepository) => _readOnlyRepository = readOnlyRepository;
 
         public async Task<bool> HierarchyExistsAsync(int hierarchyId, CancellationToken cancellationToken)
         {
