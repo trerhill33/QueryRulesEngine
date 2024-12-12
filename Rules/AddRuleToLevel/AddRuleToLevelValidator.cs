@@ -1,14 +1,23 @@
 ﻿using FluentValidation;
+using QueryRulesEngine.dtos;
+using QueryRulesEngine.Repositories.Interfaces;
 
 namespace QueryRulesEngine.Rules.AddRuleToLevel
 {
     public sealed class AddRuleToLevelValidator : AbstractValidator<AddRuleToLevelRequest>
     {
-        private readonly IHierarchyRepository _repository;
+        private readonly IHierarchyRepository _hierarchyRepository;
+        private readonly IRuleRepository _ruleRepository;
+        private readonly ILevelRepository _levelRepository;
 
-        public AddRuleToLevelValidator(IHierarchyRepository repository)
+        public AddRuleToLevelValidator(
+            IHierarchyRepository hierarchyRepository,
+            IRuleRepository ruleRepository,
+            ILevelRepository levelRepository)
         {
-            _repository = repository;
+            _hierarchyRepository = hierarchyRepository;
+            _ruleRepository = ruleRepository;
+            _levelRepository = levelRepository;
             ConfigureValidationRules();
         }
 
@@ -34,13 +43,20 @@ namespace QueryRulesEngine.Rules.AddRuleToLevel
         }
 
         private async Task<bool> HierarchyExistsAsync(int hierarchyId, CancellationToken cancellationToken)
-            => await _repository.HierarchyExistsAsync(hierarchyId, cancellationToken);
+            => await _hierarchyRepository.HierarchyExistsAsync(hierarchyId, cancellationToken);
 
         private async Task<bool> LevelExistsAsync(AddRuleToLevelRequest request, int levelNumber, CancellationToken cancellationToken)
-            => await _repository.LevelExistsAsync(request.HierarchyId, levelNumber, cancellationToken);
+            => await _levelRepository.LevelExistsAsync(request.HierarchyId, levelNumber, cancellationToken);
 
         private async Task<bool> BeUniqueRuleNumberAsync(AddRuleToLevelRequest request, string ruleNumber, CancellationToken cancellationToken)
-            => await _repository.IsUniqueRuleNumberAsync(request.HierarchyId, request.LevelNumber, ruleNumber, cancellationToken);
+            => await _ruleRepository.ExistsAsync(new RuleDto()
+            {
+                HierarchyId = request.HierarchyId,
+                RuleNumber = request.RuleNumber,
+                LevelNumber = request.LevelNumber,
+                QueryMatrix = request.QueryMatrix,
+            },
+                cancellationToken);
 
     }
 }

@@ -1,14 +1,18 @@
 ﻿using FluentValidation;
+using QueryRulesEngine.Repositories;
+using QueryRulesEngine.Repositories.Interfaces;
 
 namespace QueryRulesEngine.Hierarchys.AddMetadataKey
 {
     public sealed class AddApproverMetadataKeyValidator : AbstractValidator<AddApproverMetadataKeyRequest>
     {
-        private readonly IHierarchyRepository _repository;
+        private readonly IHierarchyRepository _hierarchyRepository;
+        private readonly IApproverMetadataRepository _approverrepository;
 
-        public AddApproverMetadataKeyValidator(IHierarchyRepository repository)
+        public AddApproverMetadataKeyValidator(IHierarchyRepository hierarchyRepository, IApproverMetadataRepository approverrepository)
         {
-            _repository = repository;
+            _hierarchyRepository = hierarchyRepository;
+            _approverrepository = approverrepository;
 
             RuleFor(x => x.HierarchyId)
                 .MustAsync(HierarchyExistsAsync)
@@ -22,9 +26,9 @@ namespace QueryRulesEngine.Hierarchys.AddMetadataKey
         }
 
         private async Task<bool> HierarchyExistsAsync(int hierarchyId, CancellationToken cancellationToken)
-            => await _repository.HierarchyExistsAsync(hierarchyId, cancellationToken);
+            => await _hierarchyRepository.HierarchyExistsAsync(hierarchyId, cancellationToken);
 
         private async Task<bool> BeUniqueKeyForHierarchy(AddApproverMetadataKeyRequest request, string keyName, CancellationToken cancellationToken)
-            => await _repository.IsUniqueMetadataKeyNameAsync(request.HierarchyId, keyName, cancellationToken);
+            => await _approverrepository.IsUniqueKeyForHierarchyAsync(request.HierarchyId, keyName, cancellationToken);
     }
 }

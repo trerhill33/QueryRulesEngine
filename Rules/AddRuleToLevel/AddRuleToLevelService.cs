@@ -30,7 +30,7 @@ namespace QueryRulesEngine.Rules.AddRuleToLevel
 
                 // 2. Extract metadata key names from QueryMatrix and validate they exist
                 var metadataKeyNames = ExtractMetadataKeyNames(request.QueryMatrix);
-                if (metadataKeyNames.Any())
+                if (metadataKeyNames.Count != 0)
                 {
                     await ValidateMetadataKeysExistAsync(request.HierarchyId, metadataKeyNames, cancellationToken);
                 }
@@ -44,10 +44,13 @@ namespace QueryRulesEngine.Rules.AddRuleToLevel
 
                 // 4. Create the rule
                 await _ruleRepository.CreateRuleAsync(
-                    request.HierarchyId,
-                    request.LevelNumber,
-                    ruleNumber.ToString(),
-                    request.QueryMatrix,
+                    new dtos.RuleDto()
+                    {
+                        HierarchyId = request.HierarchyId, 
+                        RuleNumber = ruleNumber.ToString(), 
+                        LevelNumber = request.LevelNumber, 
+                        QueryMatrix = request.QueryMatrix,
+                    },
                     cancellationToken);
 
                 // 5. Build and return success response

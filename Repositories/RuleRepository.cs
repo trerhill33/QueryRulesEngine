@@ -1,6 +1,6 @@
-﻿using QueryRulesEngine.Entities;
+﻿using QueryRulesEngine.dtos;
+using QueryRulesEngine.Entities;
 using QueryRulesEngine.Persistence;
-using QueryRulesEngine.QueryEngine.Common.Models;
 using QueryRulesEngine.QueryEngine.Persistence;
 using QueryRulesEngine.Repositories.Interfaces;
 using System.Data;
@@ -11,31 +11,26 @@ public sealed class RuleRepository(
     IQueryPersistenceService queryPersistenceService) : IRuleRepository
 {
     public async Task<bool> ExistsAsync(
-        int hierarchyId,
-        int levelNumber,
-        string ruleNumber,
+        RuleDto rule,
         CancellationToken cancellationToken)
     {
-        var ruleKeyPattern = $"level.{levelNumber}.rule.{ruleNumber}.query:";
+        var ruleKeyPattern = $"level.{rule.LevelNumber}.rule.{rule.RuleNumber}.query:";
         return await readOnlyRepository.FindByPredicateAndTransformAsync<MetadataKey, bool>(
-            mk => mk.HierarchyId == hierarchyId && mk.KeyName.StartsWith(ruleKeyPattern),
+            mk => mk.HierarchyId == rule.HierarchyId && mk.KeyName.StartsWith(ruleKeyPattern),
             mk => true,
             cancellationToken);
     }
 
     public async Task CreateRuleAsync(
-        int hierarchyId,
-        int levelNumber,
-        string ruleNumber,
-        QueryMatrix queryMatrix,
+        RuleDto rule,
         CancellationToken cancellationToken)
     {
-        var persistedQuery = queryPersistenceService.ConvertToStorageFormat(queryMatrix);
-        var ruleKeyName = $"level.{levelNumber}.rule.{ruleNumber}.query:{persistedQuery}";
+        var persistedQuery = queryPersistenceService.ConvertToStorageFormat(rule.QueryMatrix);
+        var ruleKeyName = $"level.{rule.LevelNumber}.rule.{rule.RuleNumber}.query:{persistedQuery}";
 
         var metadataKey = new MetadataKey
         {
-            HierarchyId = hierarchyId,
+            HierarchyId = rule.HierarchyId,
             KeyName = ruleKeyName
         };
 
@@ -43,6 +38,29 @@ public sealed class RuleRepository(
         {
             var repository = unitOfWork.Repository<MetadataKey>();
             await repository.AddAsync(metadataKey, cancellationToken);
+            await unitOfWork.CommitAsync(cancellationToken);
+        }, cancellationToken);
+    }
+
+    public async Task UpdateRuleAsync(
+    RuleDto rule,
+    CancellationToken cancellationToken)
+    {
+        var persistedQuery = queryPersistenceService.ConvertToStorageFormat(rule.QueryMatrix);
+        var ruleKeyName = $"level.{rule.LevelNumber}.rule.{rule.RuleNumber}.query:{persistedQuery}";
+
+        var metadataKey = await readOnlyRepository.FindByPredicateAsync<MetadataKey>(
+            mk =>
+            mk.HierarchyId == rule.HierarchyId
+            && mk.KeyName.StartsWith($"level.{rule.LevelNumber}.rule.{rule.RuleNumber}"),
+            cancellationToken)
+            ?? throw new InvalidOperationException($"Rule with Level {rule.RuleNumber} not found.");
+
+        metadataKey.KeyName = ruleKeyName;
+
+        await unitOfWork.ExecuteInTransactionAsync(async () =>
+        {
+            await unitOfWork.Repository<MetadataKey>().UpdateAsync(metadataKey);
             await unitOfWork.CommitAsync(cancellationToken);
         }, cancellationToken);
     }
@@ -113,4 +131,33 @@ public sealed class RuleRepository(
             return null;
         }
     }
+
+    public async Task<RuleDto> GetRuleAsync(
+        int hierarchyId,
+        int levelNumber,
+        string ruleNumber,
+        CancellationToken cancellationToken)
+    {
+        var metadataKey = await readOnlyRepository.FindByPredicateAsync<MetadataKey>(
+            mk => mk.HierarchyId == hierarchyId &&
+                  mk.KeyName.StartsWith($"level.{levelNumber}.rule.{ruleNumber}.query:"),
+            cancellationToken);
+
+        if (metadataKey == null)
+            return null;
+
+        var queryStartIndex = metadataKey.KeyName.IndexOf("query:") + 6;
+        var persistedQuery = metadataKey.KeyName[queryStartIndex..];
+        var queryMatrix = queryPersistenceService.ParseFromStorageFormat(persistedQuery);
+
+        return new RuleDto
+        {
+            HierarchyId = hierarchyId,
+            LevelNumber = levelNumber,
+            RuleNumber = ruleNumber,
+            QueryMatrix = queryMatrix
+        };
+    }
+
+
 }
