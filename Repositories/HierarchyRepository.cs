@@ -5,7 +5,7 @@ namespace QueryRulesEngine.Repositories
 {
     public sealed class HierarchyRepository(
         IUnitOfWork<int> unitOfWork,
-        IReadOnlyRepositoryAsync<int> readOnlyRepository) : QueryRulesEngine.Repositories.Interfaces.IHierarchyRepository
+        IReadOnlyRepositoryAsync<int> readOnlyRepository) : Interfaces.IHierarchyRepository
     {
         public async Task<bool> HierarchyExistsAsync(int hierarchyId, CancellationToken cancellationToken) =>
             await readOnlyRepository.FindByPredicateAndTransformAsync<Hierarchy, bool>(

@@ -6,7 +6,7 @@ using QueryRulesEngine.Repositories.Interfaces;
 namespace QueryRulesEngine.Hierarchys.CreateHierarchy
 {
     public sealed class CreateHierarchyService(
-        QueryRulesEngine.Repositories.Interfaces.IHierarchyRepository hierarchyRepository,
+        IHierarchyRepository hierarchyRepository,
         ILevelRepository levelRepository,
         IValidator<CreateHierarchyRequest> validator) : ICreateHierarchyService
     {

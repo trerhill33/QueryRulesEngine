@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using QueryRulesEngine.Entities;
 using QueryRulesEngine.Persistence;
 using QueryRulesEngine.Repositories.Interfaces;
 

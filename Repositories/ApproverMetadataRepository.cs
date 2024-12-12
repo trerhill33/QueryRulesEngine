@@ -28,8 +28,7 @@ namespace QueryRulesEngine.Repositories
                 KeyName = $"ApproverMetadataKey.{keyName}"
             };
 
-            var repository = _unitOfWork.Repository<MetadataKey>();
-            await repository.AddAsync(metadataKey, cancellationToken);
+            await _unitOfWork.Repository<MetadataKey>().AddAsync(metadataKey, cancellationToken);
             await _unitOfWork.CommitAsync(cancellationToken);
         }
     }

@@ -4,7 +4,6 @@ using QueryRulesEngine.Repositories.Interfaces;
 
 namespace QueryRulesEngine.Repositories
 {
-
     public sealed class LevelRepository(
         IUnitOfWork<int> unitOfWork,
         IReadOnlyRepositoryAsync<int> readOnlyRepository) : ILevelRepository
@@ -29,7 +28,7 @@ namespace QueryRulesEngine.Repositories
         {
             var levelKey = $"level.{levelNumber}";
             return await readOnlyRepository.FindByPredicateAndTransformAsync<MetadataKey, bool>(
-                mk => mk.HierarchyId == hierarchyId && mk.KeyName == levelKey,
+                mk => mk.HierarchyId == hierarchyId && mk.KeyName.StartsWith(levelKey),
                 mk => true,
                 cancellationToken);
         }

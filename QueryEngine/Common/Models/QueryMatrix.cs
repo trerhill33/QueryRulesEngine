@@ -2,8 +2,8 @@
 {
     public sealed record QueryMatrix
     {
-        public required QueryOperator LogicalOperator { get; init; }
+        public required QueryOperator LogicalOperator { get; set; }
         public required IReadOnlyCollection<QueryCondition> Conditions { get; init; } = new List<QueryCondition>();
-        public required IReadOnlyCollection<QueryMatrix> NestedMatrices { get; init; } = new List<QueryMatrix>();
+        public IReadOnlyCollection<QueryMatrix> NestedMatrices { get; init; } = new List<QueryMatrix>();
     }
 }
