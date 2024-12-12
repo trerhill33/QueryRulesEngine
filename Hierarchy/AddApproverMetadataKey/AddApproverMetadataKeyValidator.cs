@@ -8,7 +8,9 @@ namespace QueryRulesEngine.Hierarchys.AddMetadataKey
         private readonly IHierarchyRepository _hierarchyRepository;
         private readonly IApproverMetadataRepository _approverrepository;
 
-        public AddApproverMetadataKeyValidator(IHierarchyRepository hierarchyRepository, IApproverMetadataRepository approverrepository)
+        public AddApproverMetadataKeyValidator(
+            IHierarchyRepository hierarchyRepository, 
+            IApproverMetadataRepository approverrepository)
         {
             _hierarchyRepository = hierarchyRepository;
             _approverrepository = approverrepository;
