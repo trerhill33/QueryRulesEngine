@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using QueryRulesEngine.Repositories;
 
 namespace QueryRulesEngine.Hierarchys.AddMetadataKey
 {

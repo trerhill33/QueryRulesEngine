@@ -3,7 +3,7 @@ using QueryRulesEngine.Persistence;
 using QueryRulesEngine.Entities;
 using System.Threading;
 using System.Threading.Tasks;
-using QueryRulesEngine.Repositories;
+using QueryRulesEngine;
 
 public sealed class GetHierarchyDetailsValidator : AbstractValidator<GetHierarchyDetailsRequest>
 {

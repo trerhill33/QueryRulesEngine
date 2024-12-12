@@ -2,7 +2,6 @@
 using QueryRulesEngine.Entities;
 using QueryRulesEngine.Persistence;
 using QueryRulesEngine.Repositories.Interfaces;
-using QueryRulesEngine.Repositories;
 
 namespace QueryRulesEngine.Hierarchys.AddApproverMetadataKey
 {

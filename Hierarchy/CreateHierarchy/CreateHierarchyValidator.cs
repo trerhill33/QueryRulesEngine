@@ -1,8 +1,8 @@
 ﻿using ApprovalHierarchyManager.Application.Features.ApprovalHierarchy.CreateHierarchy.Models;
 using FluentValidation;
+using QueryRulesEngine;
 using QueryRulesEngine.Entities;
 using QueryRulesEngine.Persistence;
-using QueryRulesEngine.Repositories;
 
 namespace ApprovalHierarchyManager.Application.Features.ApprovalHierarchy.CreateHierarchy.Validators;
 
