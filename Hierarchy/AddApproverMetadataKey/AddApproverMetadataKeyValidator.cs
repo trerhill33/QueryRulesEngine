@@ -3,11 +3,11 @@ using QueryRulesEngine.Repositories;
 
 namespace QueryRulesEngine.Hierarchys.AddMetadataKey
 {
-    public sealed class AddMetadataKeyValidator : AbstractValidator<AddMetadataKeyRequest>
+    public sealed class AddApproverMetadataKeyValidator : AbstractValidator<AddApproverMetadataKeyRequest>
     {
         private readonly IHierarchyRepository _repository;
 
-        public AddMetadataKeyValidator(IHierarchyRepository repository)
+        public AddApproverMetadataKeyValidator(IHierarchyRepository repository)
         {
             _repository = repository;
 
@@ -25,7 +25,7 @@ namespace QueryRulesEngine.Hierarchys.AddMetadataKey
         private async Task<bool> HierarchyExistsAsync(int hierarchyId, CancellationToken cancellationToken)
             => await _repository.HierarchyExistsAsync(hierarchyId, cancellationToken);
 
-        private async Task<bool> BeUniqueKeyForHierarchy(AddMetadataKeyRequest request, string keyName, CancellationToken cancellationToken)
+        private async Task<bool> BeUniqueKeyForHierarchy(AddApproverMetadataKeyRequest request, string keyName, CancellationToken cancellationToken)
             => await _repository.IsUniqueMetadataKeyNameAsync(request.HierarchyId, keyName, cancellationToken);
     }
 }

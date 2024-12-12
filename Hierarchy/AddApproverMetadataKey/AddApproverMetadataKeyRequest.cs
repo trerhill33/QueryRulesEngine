@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 
-public record AddMetadataKeyResponse
+public record AddApproverMetadataKeyRequest
 {
     public required int HierarchyId { get; init; }
     public required string KeyName { get; init; }
 }
-
