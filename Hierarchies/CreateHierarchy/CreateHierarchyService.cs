@@ -1,9 +1,8 @@
-﻿using ApprovalHierarchyManager.Application.Features.ApprovalHierarchy.CreateHierarchy.Models;
-using FluentValidation;
+﻿using FluentValidation;
 using QueryRulesEngine.Persistence;
 using QueryRulesEngine.Repositories.Interfaces;
 
-namespace QueryRulesEngine.Hierarchys.CreateHierarchy
+namespace QueryRulesEngine.Hierarchies.CreateHierarchy
 {
     public sealed class CreateHierarchyService(
         IHierarchyRepository hierarchyRepository,
@@ -27,6 +26,7 @@ namespace QueryRulesEngine.Hierarchys.CreateHierarchy
                 var hierarchy = await hierarchyRepository.CreateHierarchyAsync(
                     request.Name,
                     request.Description,
+                    request.Tag,
                     cancellationToken);
 
                 // 3. Create default levels
@@ -54,7 +54,7 @@ namespace QueryRulesEngine.Hierarchys.CreateHierarchy
              FluentValidation.Results.ValidationResult validationResult)
         {
             var errorMessages = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
-            return await Result<CreateHierarchyResponse >.FailAsync(
+            return await Result<CreateHierarchyResponse>.FailAsync(
                 errorMessages,
                 ResultStatus.Error);
         }

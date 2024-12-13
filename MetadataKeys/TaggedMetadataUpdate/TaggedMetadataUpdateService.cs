@@ -5,7 +5,7 @@ namespace QueryRulesEngine.MetadataKeys.TaggedMetadataUpdate
 {
     public class TaggedMetadataUpdateService(
         IUnitOfWork<int> unitOfWork,
-        IReadOnlyRepositoryAsync<int> readOnlyRepository)
+        IReadOnlyRepositoryAsync<int> readOnlyRepository) : ITaggedMetadataUpdateService
     {
         private readonly IUnitOfWork<int> _unitOfWork = unitOfWork;
         private readonly IReadOnlyRepositoryAsync<int> _readOnlyRepository = readOnlyRepository;

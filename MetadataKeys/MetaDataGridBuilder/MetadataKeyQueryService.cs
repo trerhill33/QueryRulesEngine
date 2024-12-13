@@ -6,7 +6,7 @@ namespace QueryRulesEngine.MetadataKeys.MetaDataGridBuilder
 {
     public class MetadataKeyQueryService(
         IReadOnlyRepositoryAsync<int> readOnlyRepository,
-        IApproverMetadataRepository approverMetadataRepository)
+        IApproverMetadataRepository approverMetadataRepository) : IMetadataKeyQueryService
     {
         private readonly IReadOnlyRepositoryAsync<int> _readOnlyRepository = readOnlyRepository;
         private readonly IApproverMetadataRepository _approverMetadataRepository = approverMetadataRepository;

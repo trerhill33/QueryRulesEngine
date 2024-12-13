@@ -1,11 +1,12 @@
 ﻿using QueryRulesEngine.Entities;
 using QueryRulesEngine.Persistence;
+using QueryRulesEngine.Repositories.Interfaces;
 
 namespace QueryRulesEngine.Repositories
 {
     public sealed class HierarchyRepository(
         IUnitOfWork<int> unitOfWork,
-        IReadOnlyRepositoryAsync<int> readOnlyRepository) : Interfaces.IHierarchyRepository
+        IReadOnlyRepositoryAsync<int> readOnlyRepository) : IHierarchyRepository
     {
         public async Task<bool> HierarchyExistsAsync(int hierarchyId, CancellationToken cancellationToken) =>
             await readOnlyRepository.FindByPredicateAndTransformAsync<Hierarchy, bool>(
@@ -19,12 +20,12 @@ namespace QueryRulesEngine.Repositories
                 h => true,
                 cancellationToken));
 
-        public async Task<Hierarchy> CreateHierarchyAsync(string name, string description, CancellationToken cancellationToken)
+        public async Task<Hierarchy> CreateHierarchyAsync(string name, string description, string tag, CancellationToken cancellationToken)
         {
-            var hierarchy = new Hierarchy { Name = name, Description = description };
-            await unitOfWork.Repository<Hierarchy>().AddAsync(hierarchy, cancellationToken);
+            var newHierarchy = new Hierarchy { Name = name, Description = description, Tag = tag };
+            await unitOfWork.Repository<Hierarchy>().AddAsync(newHierarchy, cancellationToken);
             await unitOfWork.CommitAsync(cancellationToken);
-            return hierarchy;
+            return newHierarchy;
         }
     }
 }

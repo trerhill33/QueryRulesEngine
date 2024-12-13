@@ -1,7 +1,6 @@
-﻿using ApprovalHierarchyManager.Application.Features.ApprovalHierarchy.CreateHierarchy.Models;
-using QueryRulesEngine.Persistence;
+﻿using QueryRulesEngine.Persistence;
 
-namespace QueryRulesEngine.Hierarchys.CreateHierarchy
+namespace QueryRulesEngine.Hierarchies.CreateHierarchy
 {
     public interface ICreateHierarchyService
     {
