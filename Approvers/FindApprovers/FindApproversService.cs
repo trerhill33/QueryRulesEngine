@@ -1,5 +1,6 @@
 ﻿using ApprovalHierarchyManager.Application.Features.Employee;
 using FluentValidation;
+using FluentValidation.Results;
 using QueryRulesEngine.Entities;
 using QueryRulesEngine.Persistence;
 using QueryRulesEngine.QueryEngine.Processors;
@@ -8,7 +9,6 @@ using QueryRulesEngine.Repositories.Interfaces;
 namespace QueryRulesEngine.Approvers.FindApprovers
 {
     public sealed class FindApproversService(
-        IHierarchyRepository hierarchyRepository,
         IReadOnlyRepositoryAsync<int> readOnlyRepository,
         IQueryProcessor queryProcessor,
         IValidator<FindApproversRequest> validator) : IFindApproversService
@@ -26,16 +26,13 @@ namespace QueryRulesEngine.Approvers.FindApprovers
                     return await HandleValidationFailureAsync(validationResult);
                 }
 
-                // 2. Get employee base query
-                var employeesQuery = readOnlyRepository.Entities.AsQueryable();
+                // 2. Build the predicate using query processor
+                var predicate = queryProcessor.BuildExpression<Employee>(request.QueryMatrix);
 
-                // 3. Apply the query matrix
-                var filteredEmployees = queryProcessor.ApplyQuery(employeesQuery, request.QueryMatrix);
-
-                // 4. Transform to DTOs
-                var potentialApprovers = await readOnlyRepository
+                // 3. Use the predicate with the repository to filter at database level
+                var filteredEmployees = await readOnlyRepository
                     .FindAllByPredicateAndTransformAsync<Employee, EmployeeDto>(
-                        filteredEmployees.Expression,
+                        predicate,
                         e => new EmployeeDto
                         {
                             TMID = e.TMID,
@@ -46,10 +43,11 @@ namespace QueryRulesEngine.Approvers.FindApprovers
                         },
                         cancellationToken);
 
-                // 5. Return response
+
+                // 4. Return response
                 return await Result<FindApproversResponse>.SuccessAsync(
                     new FindApproversResponse(
-                        PotentialApprovers: potentialApprovers));
+                        PotentialApprovers: filteredEmployees));
             }
             catch (Exception ex)
             {

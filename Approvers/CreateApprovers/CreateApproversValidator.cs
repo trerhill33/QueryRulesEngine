@@ -63,4 +63,3 @@ public sealed class CreateApproversValidator : AbstractValidator<CreateApprovers
         return !existingApprovers.Any();
     }
 }
-}
