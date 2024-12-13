@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using QueryRulesEngine.Repositories.Interfaces;
 
-namespace QueryRulesEngine.Hierarchys.MetadataKeys.RemoveApproverMetadataKey
+namespace QueryRulesEngine.MetadataKeys.RemoveApproverMetadataKey
 {
     public sealed class RemoveApproverMetadataKeyValidator : AbstractValidator<RemoveApproverMetadataKeyRequest>
     {

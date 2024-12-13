@@ -1,8 +1,6 @@
-﻿using QueryRulesEngine.Hierarchys.MetadataKeys.SyncApproverMetadataKeys;
-using QueryRulesEngine.Hierarchyss.MetadataKeys.SyncApproverMetadataKeys;
-using QueryRulesEngine.Persistence;
+﻿using QueryRulesEngine.Persistence;
 
-namespace QueryRulesEngine.Hierarchys.MetadataKeys.SyncApproverMetadataKeys
+namespace QueryRulesEngine.MetadataKeys.SyncApproverMetadataKeys
 {
     public interface ISyncApproverMetadataKeysService
     {

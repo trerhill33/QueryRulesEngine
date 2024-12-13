@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace QueryRulesEngine.Hierarchies.CreateHierarchy;
+﻿namespace QueryRulesEngine.Hierarchies.CreateHierarchy;
 
 public record CreateHierarchyResponse
 {

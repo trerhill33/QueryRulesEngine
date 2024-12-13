@@ -1,4 +1,4 @@
-﻿using ApprovalHierarchyManager.Application.Features.Employee;
+﻿using QueryRulesEngine.dtos;
 
 namespace QueryRulesEngine.Approvers.FindApprovers
 {

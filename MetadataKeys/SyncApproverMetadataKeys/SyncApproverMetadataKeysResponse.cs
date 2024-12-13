@@ -1,4 +1,4 @@
-﻿namespace QueryRulesEngine.Hierarchyss.MetadataKeys.SyncApproverMetadataKeys
+﻿namespace QueryRulesEngine.MetadataKeys.SyncApproverMetadataKeys
 {
     public record SyncApproverMetadataKeysResponse(
         int HierarchyId,

@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using QueryRulesEngine.Hierarchys.MetadataKeys.RemoveApproverMetadataKey;
-using QueryRulesEngine.Hierarchys.MetadataKeys.SyncApproverMetadataKeys;
-using QueryRulesEngine.Hierarchyss.MetadataKeys.SyncApproverMetadataKeys;
 using QueryRulesEngine.MetadataKeys.MetaDataGridBuilder;
+using QueryRulesEngine.MetadataKeys.RemoveApproverMetadataKey;
+using QueryRulesEngine.MetadataKeys.SyncApproverMetadataKeys;
 using QueryRulesEngine.Persistence;
 using Swashbuckle.AspNetCore.Annotations;
 namespace QueryRulesEngine.Controllers

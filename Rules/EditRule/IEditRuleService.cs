@@ -1,7 +1,6 @@
 ﻿using QueryRulesEngine.Persistence;
-using QueryRulesEngine.Rules.EditRule;
 
-namespace QueryRulesEngine.Hierarchys.EditRule
+namespace QueryRulesEngine.Rules.EditRule
 {
     public interface IEditRuleService
     {

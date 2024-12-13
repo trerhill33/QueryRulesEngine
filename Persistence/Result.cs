@@ -12,7 +12,7 @@ namespace QueryRulesEngine.Persistence
 
     public class Result : IResult
     {
-        public List<string> Messages { get; set; } = new List<string>();
+        public List<string> Messages { get; set; } = [];
 
 
         public bool Succeeded { get; set; }

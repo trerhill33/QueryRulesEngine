@@ -3,7 +3,7 @@
 namespace QueryRulesEngine.Entities
 {
     public class Employee : AuditableEntity<int>
-    { 
+    {
         public string TMID { get; set; }
         public string Name { get; set; }
         public string Email { get; set; }

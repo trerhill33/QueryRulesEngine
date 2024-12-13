@@ -1,4 +1,4 @@
-﻿namespace QueryRulesEngine.Hierarchys.MetadataKeys.RemoveApproverMetadataKey
+﻿namespace QueryRulesEngine.MetadataKeys.RemoveApproverMetadataKey
 {
     public record RemoveApproverMetadataKeyRequest
     {

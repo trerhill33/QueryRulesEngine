@@ -1,6 +1,6 @@
 ﻿using QueryRulesEngine.QueryEngine.Builders;
-using System.Linq.Expressions;
 using QueryRulesEngine.QueryEngine.Common.Models;
+using System.Linq.Expressions;
 
 namespace QueryRulesEngine.QueryEngine.Processors
 {

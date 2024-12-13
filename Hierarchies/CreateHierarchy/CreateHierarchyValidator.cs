@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using QueryRulesEngine;
 using QueryRulesEngine.Repositories.Interfaces;
 
 namespace QueryRulesEngine.Hierarchies.CreateHierarchy;

@@ -1,6 +1,6 @@
 ﻿using QueryRulesEngine.Persistence;
 
-namespace QueryRulesEngine.Hierarchys.MetadataKeys.RemoveApproverMetadataKey
+namespace QueryRulesEngine.MetadataKeys.RemoveApproverMetadataKey
 {
     public interface IRemoveApproverMetadataKeyService
     {

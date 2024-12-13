@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using QueryRulesEngine.Repositories.Interfaces;
 
-namespace QueryRulesEngine.Hierarchys.MetadataKeys.AddApproverMetadataKey
+namespace QueryRulesEngine.MetadataKeys.AddApproverMetadataKey
 {
     public sealed class AddApproverMetadataKeyValidator : AbstractValidator<AddApproverMetadataKeyRequest>
     {

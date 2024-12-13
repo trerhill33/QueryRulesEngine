@@ -1,12 +1,10 @@
 ﻿using FluentValidation;
 using FluentValidation.Results;
 using QueryRulesEngine.Entities;
-using QueryRulesEngine.Hierarchys.MetadataKeys.SyncApproverMetadataKeys;
-using QueryRulesEngine.Hierarchyss.MetadataKeys.SyncApproverMetadataKeys;
 using QueryRulesEngine.Persistence;
 using QueryRulesEngine.Repositories.Interfaces;
 
-namespace QueryRulesEngine.Hierarchys.MetadataKeys.SyncApproverMetadataKeys
+namespace QueryRulesEngine.MetadataKeys.SyncApproverMetadataKeys
 {
     public sealed class SyncApproverMetadataKeysService(
         IApproverMetadataRepository approverMetadataRepository,
@@ -98,7 +96,7 @@ namespace QueryRulesEngine.Hierarchys.MetadataKeys.SyncApproverMetadataKeys
 
                 foreach (var approverId in approvers)
                 {
-                    var approverKeys = existingByApprover.GetValueOrDefault(approverId, new HashSet<string>());
+                    var approverKeys = existingByApprover.GetValueOrDefault(approverId, []);
                     var missingKeys = metadataKeys.Except(approverKeys).ToList();
 
                     foreach (var key in missingKeys)
@@ -108,7 +106,7 @@ namespace QueryRulesEngine.Hierarchys.MetadataKeys.SyncApproverMetadataKeys
                             HierarchyId = hierarchyId,
                             ApproverId = approverId,
                             Key = key,
-                            Value = String.Empty
+                            Value = string.Empty
                         }, cancellationToken);
 
                         recordsAdded++;

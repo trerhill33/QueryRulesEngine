@@ -1,7 +1,6 @@
 ﻿using QueryRulesEngine.Persistence;
-using QueryRulesEngine.Rules.RemoveRule;
 
-namespace QueryRulesEngine.Hierarchys.RemoveRule
+namespace QueryRulesEngine.Rules.RemoveRule
 {
     public interface IRemoveRuleService
     {

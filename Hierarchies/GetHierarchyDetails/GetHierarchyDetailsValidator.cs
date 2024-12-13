@@ -1,9 +1,4 @@
 ﻿using FluentValidation;
-using QueryRulesEngine.Persistence;
-using QueryRulesEngine.Entities;
-using System.Threading;
-using System.Threading.Tasks;
-using QueryRulesEngine;
 using QueryRulesEngine.Repositories.Interfaces;
 
 public sealed class GetHierarchyDetailsValidator : AbstractValidator<GetHierarchyDetailsRequest>

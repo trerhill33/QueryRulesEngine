@@ -4,7 +4,7 @@ using QueryRulesEngine.Entities;
 using QueryRulesEngine.Persistence;
 using QueryRulesEngine.Repositories.Interfaces;
 
-namespace QueryRulesEngine.Hierarchys.MetadataKeys.RemoveApproverMetadataKey
+namespace QueryRulesEngine.MetadataKeys.RemoveApproverMetadataKey
 {
     public sealed class RemoveApproverMetadataKeyService(
         IApproverMetadataRepository approverMetadataRepository,

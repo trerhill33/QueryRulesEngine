@@ -2,9 +2,8 @@
 using FluentValidation.Results;
 using QueryRulesEngine.Entities;
 using QueryRulesEngine.Persistence;
-using QueryRulesEngine.Rules.RemoveRule;
 
-namespace QueryRulesEngine.Hierarchys.RemoveRule
+namespace QueryRulesEngine.Rules.RemoveRule
 {
     public sealed class RemoveRuleService(
         IUnitOfWork<int> unitOfWork,
@@ -28,7 +27,7 @@ namespace QueryRulesEngine.Hierarchys.RemoveRule
 
                 // 2. Fetch the existing rule using the correct repository method
                 var rule = await _readOnlyRepository.FindByPredicateAsync<MetadataKey>(
-                    mk => 
+                    mk =>
                           mk.HierarchyId == request.HierarchyId &&
                           mk.KeyName.StartsWith($"level.{request.LevelNumber}.rule.{request.RuleNumber}.query:"),
                     cancellationToken);

@@ -1,5 +1,4 @@
-﻿using QueryRulesEngine.dtos;
-using QueryRulesEngine.QueryEngine.Common.Models;
+﻿using QueryRulesEngine.QueryEngine.Common.Models;
 
 public record AddRuleToLevelResponse
 {

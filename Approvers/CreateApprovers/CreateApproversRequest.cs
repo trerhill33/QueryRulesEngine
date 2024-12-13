@@ -2,6 +2,6 @@
 {
     public sealed record CreateApproversRequest(
         int HierarchyId,
-        List<string> EmployeeTMIds  
+        List<string> EmployeeTMIds
     );
 }

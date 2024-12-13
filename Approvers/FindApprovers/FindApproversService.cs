@@ -1,10 +1,9 @@
-﻿using ApprovalHierarchyManager.Application.Features.Employee;
-using FluentValidation;
+﻿using FluentValidation;
 using FluentValidation.Results;
+using QueryRulesEngine.dtos;
 using QueryRulesEngine.Entities;
 using QueryRulesEngine.Persistence;
 using QueryRulesEngine.QueryEngine.Processors;
-using QueryRulesEngine.Repositories.Interfaces;
 
 namespace QueryRulesEngine.Approvers.FindApprovers
 {

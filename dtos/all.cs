@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ApprovalHierarchyManager.Application.Features.Employee;
+namespace QueryRulesEngine.dtos;
 
 public record EmployeeDto
 {

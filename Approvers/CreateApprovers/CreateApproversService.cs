@@ -11,7 +11,7 @@ namespace QueryRulesEngine.Approvers.CreateApprovers
         IValidator<CreateApproversRequest> validator) : ICreateApproversService
     {
         private readonly IReadOnlyRepositoryAsync<int> _readOnlyRepository = readOnlyRepository;
-        private readonly IUnitOfWork<int> _unitOfWork = unitOfWork;  
+        private readonly IUnitOfWork<int> _unitOfWork = unitOfWork;
         private readonly IValidator<CreateApproversRequest> _validator = validator;
 
         public async Task<Result<CreateApproversResponse>> ExecuteAsync(

@@ -3,9 +3,8 @@ using FluentValidation.Results;
 using QueryRulesEngine.Persistence;
 using QueryRulesEngine.QueryEngine.Common.Models;
 using QueryRulesEngine.Repositories.Interfaces;
-using QueryRulesEngine.Rules.EditRule;
 
-namespace QueryRulesEngine.Hierarchys.EditRule
+namespace QueryRulesEngine.Rules.EditRule
 {
     public sealed class EditRuleService(
         IRuleRepository ruleRepository,

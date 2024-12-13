@@ -4,7 +4,7 @@ using QueryRulesEngine.Entities;
 using QueryRulesEngine.Persistence;
 using QueryRulesEngine.Repositories.Interfaces;
 
-namespace QueryRulesEngine.Hierarchys.MetadataKeys.AddApproverMetadataKey
+namespace QueryRulesEngine.MetadataKeys.AddApproverMetadataKey
 {
     public sealed class AddApproverMetadataKeyService(
         IApproverMetadataRepository approverMetadataRepository,

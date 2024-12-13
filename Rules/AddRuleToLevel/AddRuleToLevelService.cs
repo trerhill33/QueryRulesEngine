@@ -46,9 +46,9 @@ namespace QueryRulesEngine.Rules.AddRuleToLevel
                 await _ruleRepository.CreateRuleAsync(
                     new dtos.RuleDto()
                     {
-                        HierarchyId = request.HierarchyId, 
-                        RuleNumber = ruleNumber.ToString(), 
-                        LevelNumber = request.LevelNumber, 
+                        HierarchyId = request.HierarchyId,
+                        RuleNumber = ruleNumber.ToString(),
+                        LevelNumber = request.LevelNumber,
                         QueryMatrix = request.QueryMatrix,
                     },
                     cancellationToken);
