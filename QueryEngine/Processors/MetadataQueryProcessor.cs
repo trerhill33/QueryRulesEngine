@@ -1,4 +1,4 @@
-﻿using QueryRulesEngine.Entities;
+﻿using QueryRulesEngine.Persistence.Entities;
 using QueryRulesEngine.QueryEngine.Builders;
 using QueryRulesEngine.QueryEngine.Common.Models;
 using System.Linq.Expressions;

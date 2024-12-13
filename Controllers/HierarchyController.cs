@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using QueryRulesEngine.Hierarchies.CreateHierarchy;
+using QueryRulesEngine.Features.Hierarchies.CreateHierarchy;
 using QueryRulesEngine.Persistence;
 using Swashbuckle.AspNetCore.Annotations;
 
