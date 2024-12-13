@@ -1,4 +1,5 @@
-﻿using QueryRulesEngine.Entities;
+﻿using QueryRulesEngine.dtos;
+using QueryRulesEngine.Entities;
 using QueryRulesEngine.Persistence;
 using QueryRulesEngine.Repositories.Interfaces;
 
@@ -37,6 +38,27 @@ namespace QueryRulesEngine.Repositories
             return await readOnlyRepository.FindAllByPredicateAndTransformAsync<MetadataKey, string>(
                 mk => mk.HierarchyId == hierarchyId && mk.KeyName.StartsWith("ApproverMetadataKey."),
                 mk => mk.KeyName,
+                cancellationToken);
+        }
+        public async Task<List<ApproverMetadataDto>> GetApproverMetadataValuesAsync(
+        string metadataKey,
+        IEnumerable<int> hierarchyIds,
+        CancellationToken cancellationToken)
+        {
+            var fullKeyName = $"ApproverMetadataKey.{metadataKey}";
+            // Get all approvers with their metadata and employee info for the specified hierarchies
+            return await _readOnlyRepository.FindAllByPredicateAsNoTrackingAndTransformAsync<Approver, ApproverMetadataDto>(
+                a => hierarchyIds.Contains(a.HierarchyId),
+                a => new ApproverMetadataDto
+                {
+                    ApproverId = a.ApproverId,
+                    ApproverName = a.Employee.Name,
+                    HierarchyId = a.HierarchyId,
+                    Value = a.Metadata
+                        .Where(m => m.Key == fullKeyName)
+                        .Select(m => m.Value)
+                        .FirstOrDefault()
+                },
                 cancellationToken);
         }
     }
