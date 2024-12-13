@@ -31,5 +31,13 @@ namespace QueryRulesEngine.Repositories
             await _unitOfWork.Repository<MetadataKey>().AddAsync(metadataKey, cancellationToken);
             await _unitOfWork.CommitAsync(cancellationToken);
         }
+
+        public async Task<List<string>> GetApproverMetadataKeysAsync(int hierarchyId, CancellationToken cancellationToken)
+        {
+            return await readOnlyRepository.FindAllByPredicateAndTransformAsync<MetadataKey, string>(
+                mk => mk.HierarchyId == hierarchyId && mk.KeyName.StartsWith("ApproverMetadataKey."),
+                mk => mk.KeyName,
+                cancellationToken);
+        }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using QueryRulesEngine.Repositories.Interfaces;
 
-namespace QueryRulesEngine.Hierarchys.AddMetadataKey
+namespace QueryRulesEngine.Hierarchys.MetadataKeys.AddApproverMetadataKey
 {
     public sealed class AddApproverMetadataKeyValidator : AbstractValidator<AddApproverMetadataKeyRequest>
     {
@@ -9,7 +9,7 @@ namespace QueryRulesEngine.Hierarchys.AddMetadataKey
         private readonly IApproverMetadataRepository _approverrepository;
 
         public AddApproverMetadataKeyValidator(
-            IHierarchyRepository hierarchyRepository, 
+            IHierarchyRepository hierarchyRepository,
             IApproverMetadataRepository approverrepository)
         {
             _hierarchyRepository = hierarchyRepository;
