@@ -31,7 +31,9 @@ namespace QueryRulesEngine.Controllers
             [FromRoute] int hierarchyId,
             [FromBody] AddApproverMetadataKeyRequest request)
         {
-            var result = await _addService.ExecuteAsync(request);
+            var result = await _addService.ExecuteAsync(
+                request with { HierarchyId = hierarchyId });
+
             return result.Succeeded ? Ok(result) : BadRequest(result);
         }
 
@@ -47,11 +49,11 @@ namespace QueryRulesEngine.Controllers
             [FromRoute] int hierarchyId,
             [FromRoute] string keyName)
         {
-            var result = await _removeService.ExecuteAsync(new RemoveApproverMetadataKeyRequest
-            {
-                HierarchyId = hierarchyId,
-                KeyName = keyName
-            });
+            var request = new RemoveApproverMetadataKeyRequest(
+                hierarchyId,
+                keyName);
+
+            var result = await _removeService.ExecuteAsync(request);
             return result.Succeeded ? Ok(result) : BadRequest(result);
         }
 
@@ -63,9 +65,11 @@ namespace QueryRulesEngine.Controllers
         [ProducesResponseType(typeof(Result<SyncApproverMetadataKeysResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Result<SyncApproverMetadataKeysResponse>), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Sync([FromRoute] int hierarchyId)
+        public async Task<IActionResult> Sync(
+            [FromRoute] int hierarchyId)
         {
-            var result = await _syncService.ExecuteAsync(new SyncApproverMetadataKeysRequest(hierarchyId));
+            var request = new SyncApproverMetadataKeysRequest(hierarchyId);
+            var result = await _syncService.ExecuteAsync(request);
             return result.Succeeded ? Ok(result) : BadRequest(result);
         }
 
@@ -79,9 +83,11 @@ namespace QueryRulesEngine.Controllers
         [ProducesResponseType(typeof(Result<MetadataGridResponse>), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetGrid(
+            [FromRoute] int hierarchyId,
             [FromRoute] string keyName)
         {
-            var result = await _queryService.GetMetadataValuesForKeyAsync(keyName);
+            var result = await _queryService.GetMetadataValuesForKeyAsync(
+                $"ApproverMetadataKey.{keyName}");
 
             if (!result.Succeeded)
                 return BadRequest(result);
