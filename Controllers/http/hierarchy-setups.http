@@ -1,6 +1,10 @@
 ﻿@baseUrl = https://localhost:7081/api/approvalhierarchymanager/v1
 
-### 1. HFA Hierarchy Setup (No approval required)
+###############################################
+### 1. HFA Setup
+###############################################
+
+### Create HFA Hierarchy
 POST {{baseUrl}}/hierarchies
 Content-Type: application/json
 
@@ -10,15 +14,31 @@ Content-Type: application/json
     "tag": "HFA"
 }
 
-### Add HFA-specific metadata keys
-POST {{baseUrl}}/hierarchies/{{hfaHierarchyId}}/metadata-keys
+### Add HFA Rules for Direct Submission
+POST {{baseUrl}}/hierarchies/{{hfaHierarchyId}}/levels/1/rules
 Content-Type: application/json
 
 {
-    "keyName": "DirectSubmission"
+    "queryMatrix": {
+        "logicalOperator": "_and",
+        "conditions": [
+            {
+                "field": "Employee.TMID",
+                "operator": "_eq",
+                "value": {
+                    "value": "BillKudletsTMID",
+                    "type": "Single"
+                }
+            }
+        ]
+    }
 }
-###########################################################################################
-### 2. Retail + Corporate Setup (2 levels)
+
+###############################################
+### 2. Retail + Corporate Setup
+###############################################
+
+### Create Retail/Corporate Hierarchy
 POST {{baseUrl}}/hierarchies
 Content-Type: application/json
 
@@ -28,15 +48,7 @@ Content-Type: application/json
     "tag": "RetailCorporate"
 }
 
-### Add Retail/Corporate metadata keys
-POST {{baseUrl}}/hierarchies/{{retailHierarchyId}}/metadata-keys
-Content-Type: application/json
-
-{
-    "keyName": "ManagerTMID"
-}
-
-### Add Level 1 Rule (Business User)
+### Add Level 1 Rule (Business User Department Check)
 POST {{baseUrl}}/hierarchies/{{retailHierarchyId}}/levels/1/rules
 Content-Type: application/json
 
@@ -55,8 +67,32 @@ Content-Type: application/json
         ]
     }
 }
-###########################################################################################
+
+### Add Level 2 Rule (Manager Approval)
+POST {{baseUrl}}/hierarchies/{{retailHierarchyId}}/levels/2/rules
+Content-Type: application/json
+
+{
+    "queryMatrix": {
+        "logicalOperator": "_and",
+        "conditions": [
+            {
+                "field": "Employee.TMID",
+                "operator": "_eq",
+                "value": {
+                    "value": "@Metadata.ManagerTMID",
+                    "type": "Single"
+                }
+            }
+        ]
+    }
+}
+
+###############################################
 ### 3. Vanderbilt V1 Setup
+###############################################
+
+### Create Vanderbilt Hierarchy
 POST {{baseUrl}}/hierarchies
 Content-Type: application/json
 
@@ -66,26 +102,59 @@ Content-Type: application/json
     "tag": "Vanderbilt"
 }
 
-### Add Michelle Batson as Level 2 approver
-POST {{baseUrl}}/hierarchies/{{vanderbiltHierarchyId}}/metadata-keys
+### Add Level 1 Rule (Business User Department Check)
+POST {{baseUrl}}/hierarchies/{{vanderbiltHierarchyId}}/levels/1/rules
 Content-Type: application/json
 
 {
-    "keyName": "ApproverTMID"
+    "queryMatrix": {
+        "logicalOperator": "_and",
+        "conditions": [
+            {
+                "field": "Employee.Department",
+                "operator": "_eq",
+                "value": {
+                    "value": "Vanderbilt",
+                    "type": "Single"
+                }
+            }
+        ]
+    }
 }
 
-### Set Michelle's TMID
-PUT {{baseUrl}}/hierarchies/{{vanderbiltHierarchyId}}/approvers/metadata
+### Add Level 2 Rule (Michelle Batson)
+POST {{baseUrl}}/hierarchies/{{vanderbiltHierarchyId}}/levels/2/rules
 Content-Type: application/json
 
 {
-    "approverId": "MichelleTMID",
-    "metadataKey": "ApproverTMID",
-    "tag": "Vanderbilt",
-    "value": "true"
+    "queryMatrix": {
+        "logicalOperator": "_and",
+        "conditions": [
+            {
+                "field": "Employee.TMID",
+                "operator": "_eq",
+                "value": {
+                    "value": "MichelleTMID",
+                    "type": "Single"
+                }
+            }
+        ]
+    }
 }
-###########################################################################################
+
+### Add Michelle as Approver
+POST {{baseUrl}}/hierarchies/{{vanderbiltHierarchyId}}/approvers
+Content-Type: application/json
+
+{
+    "employeeTMIds": ["MichelleTMID"]
+}
+
+###############################################
 ### 4. Manufacturing/CBG Setup
+###############################################
+
+### Create Manufacturing Hierarchy
 POST {{baseUrl}}/hierarchies
 Content-Type: application/json
 
@@ -95,34 +164,63 @@ Content-Type: application/json
     "tag": "Manufacturing"
 }
 
-### Add Manufacturing metadata keys
-POST {{baseUrl}}/hierarchies/{{manufacturingHierarchyId}}/metadata-keys
+### Add Level 1 Rule (Business User)
+POST {{baseUrl}}/hierarchies/{{manufacturingHierarchyId}}/levels/1/rules
 Content-Type: application/json
 
 {
-    "keyName": "ExpenseLimit"
+    "queryMatrix": {
+        "logicalOperator": "_and",
+        "conditions": [
+            {
+                "field": "Employee.Department",
+                "operator": "_eq",
+                "value": {
+                    "value": "Manufacturing",
+                    "type": "Single"
+                }
+            }
+        ]
+    }
 }
 
-# Add backup approvers
-POST {{baseUrl}}/hierarchies/{{manufacturingHierarchyId}}/metadata-keys
+### Add Level 2 Rule (Angie or Backup)
+POST {{baseUrl}}/hierarchies/{{manufacturingHierarchyId}}/levels/2/rules
 Content-Type: application/json
 
 {
-    "keyName": "BackupApprover"
+    "queryMatrix": {
+        "logicalOperator": "_or",
+        "conditions": [
+            {
+                "field": "Employee.TMID",
+                "operator": "_eq",
+                "value": {
+                    "value": "AngieTMID",
+                    "type": "Single"
+                }
+            },
+            {
+                "field": "ApproverMetadataKey.BackupApprover",
+                "operator": "_eq",
+                "value": {
+                    "value": "true",
+                    "type": "Single"
+                }
+            }
+        ]
+    }
 }
 
-### Set Angie as primary Level 2 approver
-PUT {{baseUrl}}/hierarchies/{{manufacturingHierarchyId}}/approvers/metadata
+### Add All Manufacturing Approvers
+POST {{baseUrl}}/hierarchies/{{manufacturingHierarchyId}}/approvers
 Content-Type: application/json
 
 {
-    "approverId": "AngieTMID",
-    "metadataKey": "ExpenseLimit",
-    "tag": "Manufacturing",
-    "value": "2500"
+    "employeeTMIds": ["AngieTMID", "BrookeTMID", "CrystalTMID"]
 }
 
-### Set Brooke as backup approver
+### Set Backup Approver Metadata
 PUT {{baseUrl}}/hierarchies/{{manufacturingHierarchyId}}/approvers/metadata
 Content-Type: application/json
 
@@ -133,7 +231,6 @@ Content-Type: application/json
     "value": "true"
 }
 
-### Set Crystal as backup approver
 PUT {{baseUrl}}/hierarchies/{{manufacturingHierarchyId}}/approvers/metadata
 Content-Type: application/json
 
