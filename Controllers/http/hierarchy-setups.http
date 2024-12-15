@@ -1,0 +1,145 @@
+﻿@baseUrl = https://localhost:7081/api/approvalhierarchymanager/v1
+
+### 1. HFA Hierarchy Setup (No approval required)
+POST {{baseUrl}}/hierarchies
+Content-Type: application/json
+
+{
+    "name": "HFA Approvals",
+    "description": "Bill Kudlets direct submission workflow",
+    "tag": "HFA"
+}
+
+### Add HFA-specific metadata keys
+POST {{baseUrl}}/hierarchies/{{hfaHierarchyId}}/metadata-keys
+Content-Type: application/json
+
+{
+    "keyName": "DirectSubmission"
+}
+###########################################################################################
+### 2. Retail + Corporate Setup (2 levels)
+POST {{baseUrl}}/hierarchies
+Content-Type: application/json
+
+{
+    "name": "Retail Corporate Approvals",
+    "description": "Two-level business user to manager approval workflow",
+    "tag": "RetailCorporate"
+}
+
+### Add Retail/Corporate metadata keys
+POST {{baseUrl}}/hierarchies/{{retailHierarchyId}}/metadata-keys
+Content-Type: application/json
+
+{
+    "keyName": "ManagerTMID"
+}
+
+### Add Level 1 Rule (Business User)
+POST {{baseUrl}}/hierarchies/{{retailHierarchyId}}/levels/1/rules
+Content-Type: application/json
+
+{
+    "queryMatrix": {
+        "logicalOperator": "_and",
+        "conditions": [
+            {
+                "field": "Employee.Department",
+                "operator": "_in",
+                "value": {
+                    "value": ["Retail", "Corporate"],
+                    "type": "Array"
+                }
+            }
+        ]
+    }
+}
+###########################################################################################
+### 3. Vanderbilt V1 Setup
+POST {{baseUrl}}/hierarchies
+Content-Type: application/json
+
+{
+    "name": "Vanderbilt Approvals",
+    "description": "Vanderbilt approval workflow - Michelle Batson approval",
+    "tag": "Vanderbilt"
+}
+
+### Add Michelle Batson as Level 2 approver
+POST {{baseUrl}}/hierarchies/{{vanderbiltHierarchyId}}/metadata-keys
+Content-Type: application/json
+
+{
+    "keyName": "ApproverTMID"
+}
+
+### Set Michelle's TMID
+PUT {{baseUrl}}/hierarchies/{{vanderbiltHierarchyId}}/approvers/metadata
+Content-Type: application/json
+
+{
+    "approverId": "MichelleTMID",
+    "metadataKey": "ApproverTMID",
+    "tag": "Vanderbilt",
+    "value": "true"
+}
+###########################################################################################
+### 4. Manufacturing/CBG Setup
+POST {{baseUrl}}/hierarchies
+Content-Type: application/json
+
+{
+    "name": "Manufacturing Approvals",
+    "description": "Manufacturing department approvals with amount thresholds",
+    "tag": "Manufacturing"
+}
+
+### Add Manufacturing metadata keys
+POST {{baseUrl}}/hierarchies/{{manufacturingHierarchyId}}/metadata-keys
+Content-Type: application/json
+
+{
+    "keyName": "ExpenseLimit"
+}
+
+# Add backup approvers
+POST {{baseUrl}}/hierarchies/{{manufacturingHierarchyId}}/metadata-keys
+Content-Type: application/json
+
+{
+    "keyName": "BackupApprover"
+}
+
+### Set Angie as primary Level 2 approver
+PUT {{baseUrl}}/hierarchies/{{manufacturingHierarchyId}}/approvers/metadata
+Content-Type: application/json
+
+{
+    "approverId": "AngieTMID",
+    "metadataKey": "ExpenseLimit",
+    "tag": "Manufacturing",
+    "value": "2500"
+}
+
+### Set Brooke as backup approver
+PUT {{baseUrl}}/hierarchies/{{manufacturingHierarchyId}}/approvers/metadata
+Content-Type: application/json
+
+{
+    "approverId": "BrookeTMID",
+    "metadataKey": "BackupApprover",
+    "tag": "Manufacturing",
+    "value": "true"
+}
+
+### Set Crystal as backup approver
+PUT {{baseUrl}}/hierarchies/{{manufacturingHierarchyId}}/approvers/metadata
+Content-Type: application/json
+
+{
+    "approverId": "CrystalTMID",
+    "metadataKey": "BackupApprover",
+    "tag": "Manufacturing",
+    "value": "true"
+}

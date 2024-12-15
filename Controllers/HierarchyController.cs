@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using QueryRulesEngine.Features.Hierarchies.CreateHierarchy;
+using QueryRulesEngine.Features.Hierarchies.DeleteHierarchy;
 using QueryRulesEngine.Persistence;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -7,18 +8,14 @@ namespace QueryRulesEngine.Controllers;
 
 [ApiController]
 [Route("api/approvalhierarchymanager/v{version:apiVersion}/hierarchies")]
-public class HierarchiesController : BaseApiController<HierarchiesController>
+public class HierarchiesController(
+    ICreateHierarchyService createService,
+    IGetHierarchyDetailsService getDetailsService,
+    IDeleteHierarchyService deleteService) : BaseApiController<HierarchiesController>
 {
-    private readonly ICreateHierarchyService _createService;
-    private readonly IGetHierarchyDetailsService _getDetailsService;
-
-    public HierarchiesController(
-        ICreateHierarchyService createService,
-        IGetHierarchyDetailsService getDetailsService)
-    {
-        _createService = createService;
-        _getDetailsService = getDetailsService;
-    }
+    private readonly ICreateHierarchyService _createService = createService;
+    private readonly IGetHierarchyDetailsService _getDetailsService = getDetailsService;
+    private readonly IDeleteHierarchyService _deleteService = deleteService;
 
     [HttpPost]
     [SwaggerOperation(
@@ -52,5 +49,19 @@ public class HierarchiesController : BaseApiController<HierarchiesController>
             return BadRequest(result);
 
         return result.Data is null ? NoContent() : Ok(result);
+    }
+    [HttpDelete("{id:int}")]
+    [SwaggerOperation(
+    Summary = "Delete hierarchy",
+    Description = "Deletes a hierarchy and all associated metadata",
+    Tags = ["Hierarchies"])]
+    [ProducesResponseType(typeof(Result<DeleteHierarchyResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Result<DeleteHierarchyResponse>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> Delete([FromRoute] int id)
+    {
+        var request = new DeleteHierarchyRequest { HierarchyId = id };
+        var result = await _deleteService.ExecuteAsync(request);
+        return result.Succeeded ? Ok(result) : BadRequest(result);
     }
 }

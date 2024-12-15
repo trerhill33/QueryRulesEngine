@@ -1,0 +1,28 @@
+﻿@baseUrl = https://localhost:7081/api/approvalhierarchymanager/v1
+
+### Create Hierarchy - Valid
+POST {{baseUrl}}/hierarchies
+Content-Type: application/json
+
+{
+    "name": "Manufacturing Approvals",
+    "description": "Manufacturing department approval workflow"
+}
+
+### Create Hierarchy - Invalid (Duplicate Name)
+POST {{baseUrl}}/hierarchies
+Content-Type: application/json
+
+{
+    "name": "Manufacturing Approvals",
+    "description": "Duplicate name test"
+}
+
+### Get Hierarchy Details
+GET {{baseUrl}}/hierarchies/1
+
+### Get Hierarchy Details - Invalid ID
+GET {{baseUrl}}/hierarchies/999
+
+### Delete Hierarchy
+GET {{baseUrl}}/hierarchies/1

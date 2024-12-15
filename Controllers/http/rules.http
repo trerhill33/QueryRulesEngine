@@ -1,0 +1,60 @@
+﻿@baseUrl = https://localhost:7081/api/approvalhierarchymanager/v1
+@hierarchyId = 1
+@levelNumber = 1
+
+### Add Rule - Valid
+POST {{baseUrl}}/hierarchies/{{hierarchyId}}/levels/{{levelNumber}}/rules
+Content-Type: application/json
+
+{
+    "levelNumber": 1,
+    "queryMatrix": {
+        "logicalOperator": "_and",
+        "conditions": [
+            {
+                "field": "Employee.Department",
+                "operator": "_eq",
+                "value": {
+                    "value": "Manufacturing",
+                    "type": "Single"
+                }
+            }
+        ]
+    }
+}
+
+### Add Rule - Invalid Query Matrix
+POST {{baseUrl}}/hierarchies/{{hierarchyId}}/levels/{{levelNumber}}/rules
+Content-Type: application/json
+
+{
+    "levelNumber": 1,
+    "queryMatrix": {
+        "logicalOperator": "invalid",
+        "conditions": []
+    }
+}
+
+### Edit Rule - Valid
+PUT {{baseUrl}}/hierarchies/{{hierarchyId}}/levels/{{levelNumber}}/rules/1
+Content-Type: application/json
+
+{
+    "levelNumber": 1,
+    "queryMatrix": {
+        "logicalOperator": "_and",
+        "conditions": [
+            {
+                "field": "Metadata.ExpenseLimit",
+                "operator": "_gt",
+                "value": {
+                    "value": "5000",
+                    "type": "Single"
+                }
+            }
+        ]
+    }
+}
+
+### Remove Rule
+DELETE {{baseUrl}}/hierarchies/{{hierarchyId}}/levels/{{levelNumber}}/rules/1

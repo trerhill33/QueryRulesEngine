@@ -8,7 +8,7 @@ namespace QueryRulesEngine.Features.Hierarchies.DeleteHierarchy
     public sealed class DeleteHierarchyService(
         IReadOnlyRepositoryAsync<int> readOnlyRepository,
         IUnitOfWork<int> unitOfWork,
-        IValidator<DeleteHierarchyRequest> validator)
+        IValidator<DeleteHierarchyRequest> validator) : IDeleteHierarchyService
     {
         private readonly IReadOnlyRepositoryAsync<int> _readOnlyRepository = readOnlyRepository;
         private readonly IUnitOfWork<int> _unitOfWork = unitOfWork;

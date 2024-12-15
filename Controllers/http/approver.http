@@ -1,0 +1,33 @@
+﻿@baseUrl = https://localhost:7081/api/approvalhierarchymanager/v1
+@hierarchyId = 1
+
+### Create Approvers - Valid
+POST {{baseUrl}}/hierarchies/{{hierarchyId}}/approvers
+Content-Type: application/json
+
+{
+    "employeeTMIds": ["331220", "331278"]
+}
+
+### Create Approvers - Invalid TMIDs
+POST {{baseUrl}}/hierarchies/{{hierarchyId}}/approvers
+Content-Type: application/json
+
+{
+    "employeeTMIds": ["invalid", "12345"]
+}
+
+### Find Approvers
+GET {{baseUrl}}/hierarchies/{{hierarchyId}}/approvers
+
+### Update Metadata Values
+PUT {{baseUrl}}/hierarchies/{{hierarchyId}}/approvers/metadata
+Content-Type: application/json
+
+{
+    "approverId": "331220",
+    "metadataKey": "ExpenseLimit",
+    "tag": "Vanderbilt",
+    "value": "50000"
+}
+}

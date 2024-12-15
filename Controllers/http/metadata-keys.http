@@ -1,0 +1,27 @@
+﻿@baseUrl = https://localhost:7081/api/approvalhierarchymanager/v1
+@hierarchyId = 1
+
+### Add Metadata Key - Valid
+POST {{baseUrl}}/hierarchies/{{hierarchyId}}/metadata-keys
+Content-Type: application/json
+
+{
+    "keyName": "ExpenseLimit"
+}
+
+### Add Metadata Key - Invalid (Duplicate)
+POST {{baseUrl}}/hierarchies/{{hierarchyId}}/metadata-keys
+Content-Type: application/json
+
+{
+    "keyName": "ExpenseLimit"
+}
+
+### Remove Metadata Key
+DELETE {{baseUrl}}/hierarchies/{{hierarchyId}}/metadata-keys/ExpenseLimit
+
+### Sync Metadata Keys
+POST {{baseUrl}}/hierarchies/{{hierarchyId}}/metadata-keys/sync
+
+### Get Metadata Grid
+GET {{baseUrl}}/hierarchies/{{hierarchyId}}/metadata-keys/ExpenseLimit/grid
