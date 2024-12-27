@@ -2,8 +2,25 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.OpenApi.Models;
+using QueryRulesEngine.Features.Rules.AddRuleToLevel;
+using QueryRulesEngine.Features.Rules.EditRule;
+using QueryRulesEngine.Features.Rules.RemoveRule;
+using QueryRulesEngine.Persistence.Repositories;
+using QueryRulesEngine.Persistence.Repositories.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
+
+
+builder.Services.AddTransient<IRuleRepository, RuleRepository>();
+builder.Services.AddTransient<IAddRuleToLevelService, AddRuleToLevelService>();
+builder.Services.AddTransient<IAddRuleToLevelService, AddRuleToLevelService>();
+builder.Services.AddTransient<IEditRuleService, EditRuleService>();
+builder.Services.AddTransient<IRemoveRuleService, RemoveRuleService>();
+builder.Services.AddTransient<ILevelRepository, LevelRepository>();
+builder.Services.AddTransient<ILevelRepository, LevelRepository>();
+builder.Services.AddTransient<ILevelRepository, LevelRepository>();
+
+
 
 // Add services to the container
 builder.Services.AddControllers();
