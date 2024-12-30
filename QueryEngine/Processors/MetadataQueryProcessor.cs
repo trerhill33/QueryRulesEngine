@@ -8,9 +8,6 @@ namespace QueryRulesEngine.QueryEngine.Processors;
 
 public class MetadataQueryProcessor : IMetadataQueryProcessor
 {
-    private const string MetadataPrefix = "ApproverMetadataKey.";
-    private const string EmployeePrefix = "Employee.";
-    private const string ContextPrefix = "@Context.";
     private string? _context;
 
     public Expression<Func<Employee, object>>[] GetRequiredIncludes() => [
@@ -18,7 +15,7 @@ public class MetadataQueryProcessor : IMetadataQueryProcessor
         e => e.Approvers.Select(a => a.Metadata)
     ];
 
-    public Expression<Func<T, bool>> BuildExpression<T>(
+    public Expression<Func<T, bool>> BuildExpressionFromQueryMatrix<T>(
         QueryMatrix matrix, 
         string context = "") 
         where T : class
@@ -37,28 +34,24 @@ public class MetadataQueryProcessor : IMetadataQueryProcessor
     {
         var expressions = new List<Expression>();
 
-        // Handle direct conditions
+        // Handle direct conditions (not nested)
         foreach (var condition in matrix.Conditions)
         {
-            // Check for context values first
-            if (condition.Value.Value?.ToString()?.StartsWith(ContextPrefix) == true)
+            if (condition.Value.Value?.ToString()?.StartsWith(QueryPrefixes.Context) == true)
             {
                 expressions.Add(BuildContextExpression(parameter, condition));
-                continue;
             }
-
-            // Then handle metadata or employee conditions
-            if (condition.Field.StartsWith(MetadataPrefix))
+            else if (condition.Field.StartsWith(QueryPrefixes.Metadata))
             {
                 expressions.Add(BuildMetadataRelatedExpression(parameter, condition));
             }
-            else if (condition.Field.StartsWith(EmployeePrefix))
+            else if (condition.Field.StartsWith(QueryPrefixes.Employee))
             {
-                expressions.Add(BuildSimpleExpression(parameter, condition));
+                expressions.Add(BuildEmployeeExpression(parameter, condition));
             }
         }
 
-        // Handle nested matrices
+        // Handle nested matrices (not direct)
         foreach (var nested in matrix.NestedMatrices)
         {
             expressions.Add(BuildMatrixExpression(nested, parameter));
@@ -67,13 +60,13 @@ public class MetadataQueryProcessor : IMetadataQueryProcessor
         return ExpressionBuilder.CombineConditions(expressions, matrix.LogicalOperator);
     }
 
-    private Expression BuildSimpleExpression(
+    private Expression BuildEmployeeExpression(
         ParameterExpression parameter, 
         QueryCondition condition)
     {
         // Strip off the "Employee." prefix to get just the property name
-        var propertyName = condition.Field.StartsWith(EmployeePrefix)
-            ? condition.Field[EmployeePrefix.Length..]
+        var propertyName = condition.Field.StartsWith(QueryPrefixes.Employee)
+            ? condition.Field[QueryPrefixes.Employee.Length..]
             : condition.Field;
 
         var property = Expression.Property(parameter, propertyName);
@@ -86,7 +79,7 @@ public class MetadataQueryProcessor : IMetadataQueryProcessor
         QueryCondition condition)
     {
         // Get the metadata key name (e.g., "FinancialLimit" from "ApproverMetadataKey.FinancialLimit")
-        var metadataKey = condition.Field[MetadataPrefix.Length..];
+        var metadataKey = condition.Field[QueryPrefixes.Metadata.Length..];
 
         // Build navigation path
         var approversProperty = Expression.Property(parameter, "Approvers");
@@ -127,7 +120,7 @@ public class MetadataQueryProcessor : IMetadataQueryProcessor
         QueryCondition condition)
     {
         // Parse the context path (e.g., "@Context.RequestedByTMID.ReportsTo")
-        var contextPath = condition.Value.Value.ToString()[ContextPrefix.Length..];
+        var contextPath = condition.Value.Value.ToString()[QueryPrefixes.Context.Length..];
         var parts = contextPath.Split('.');
 
         // Use the actual context value passed in at runtime instead of a parameter
@@ -136,8 +129,8 @@ public class MetadataQueryProcessor : IMetadataQueryProcessor
         // If there's a property navigation (e.g., "ReportsTo")
         if (parts.Length > 1)
         {
-            var propertyName = parts[1].StartsWith(EmployeePrefix)
-                ? parts[1][EmployeePrefix.Length..]
+            var propertyName = parts[1].StartsWith(QueryPrefixes.Employee)
+                ? parts[1][QueryPrefixes.Employee.Length..]
                 : parts[1];
 
             var propertyToCompare = Expression.Property(parameter, propertyName);
@@ -148,8 +141,8 @@ public class MetadataQueryProcessor : IMetadataQueryProcessor
                 condition.Operator);
         }
 
-        var fieldName = condition.Field.StartsWith(EmployeePrefix)
-            ? condition.Field.Substring(EmployeePrefix.Length)
+        var fieldName = condition.Field.StartsWith(QueryPrefixes.Employee)
+            ? condition.Field.Substring(QueryPrefixes.Employee.Length)
             : condition.Field;
 
         var property = Expression.Property(parameter, fieldName);

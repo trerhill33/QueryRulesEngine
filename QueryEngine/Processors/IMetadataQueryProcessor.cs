@@ -6,6 +6,6 @@ namespace QueryRulesEngine.QueryEngine.Processors;
 
 public interface IMetadataQueryProcessor
 {
-    Expression<Func<T, bool>> BuildExpression<T>(QueryMatrix matrix, string context = "") where T : class;
+    Expression<Func<T, bool>> BuildExpressionFromQueryMatrix<T>(QueryMatrix matrix, string context = "") where T : class;
     Expression<Func<Employee, object>>[] GetRequiredIncludes();
 }
