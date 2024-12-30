@@ -1,147 +1,182 @@
-﻿using QueryRulesEngine.Persistence.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using QueryRulesEngine.Persistence.Entities;
 using QueryRulesEngine.QueryEngine.Builders;
 using QueryRulesEngine.QueryEngine.Common.Models;
 using System.Linq.Expressions;
 
-namespace QueryRulesEngine.QueryEngine.Processors
+namespace QueryRulesEngine.QueryEngine.Processors;
+
+public class MetadataQueryProcessor : IMetadataQueryProcessor
 {
-    public class MetadataQueryProcessor(IQueryProcessor baseProcessor) : IMetadataQueryProcessor
+    private const string MetadataPrefix = "ApproverMetadataKey.";
+    private const string EmployeePrefix = "Employee.";
+    private const string ContextPrefix = "@Context.";
+    private string? _context;
+
+    public Expression<Func<Employee, object>>[] GetRequiredIncludes() => [
+        e => e.Approvers,
+        e => e.Approvers.Select(a => a.Metadata)
+    ];
+
+    public Expression<Func<T, bool>> BuildExpression<T>(
+        QueryMatrix matrix, 
+        string context = "") 
+        where T : class
     {
-        private readonly IQueryProcessor _baseProcessor = baseProcessor;
-        private const string MetadataPrefix = "Metadata.";
-        private const string EmployeePrefix = "Employee.";
+        ArgumentNullException.ThrowIfNull(matrix);
+        _context = context;
 
-        public IQueryable<T> ApplyQuery<T>(IQueryable<T> source, QueryMatrix matrix) where T : class
+        var parameter = Expression.Parameter(typeof(T), "x");
+        var body = BuildMatrixExpression(matrix, parameter);
+        return Expression.Lambda<Func<T, bool>>(body, parameter);
+    }
+
+    private Expression BuildMatrixExpression(
+        QueryMatrix matrix, 
+        ParameterExpression parameter)
+    {
+        var expressions = new List<Expression>();
+
+        // Handle direct conditions
+        foreach (var condition in matrix.Conditions)
         {
-            ArgumentNullException.ThrowIfNull(source);
-            ArgumentNullException.ThrowIfNull(matrix);
-
-            var expression = BuildExpression<T>(matrix);
-            return source.Where(expression);
-        }
-
-        public Expression<Func<T, bool>> BuildExpression<T>(QueryMatrix matrix) where T : class
-        {
-            ArgumentNullException.ThrowIfNull(matrix);
-
-            var parameter = Expression.Parameter(typeof(T), "x");
-            var body = BuildMatrixExpression(matrix, parameter);
-            return Expression.Lambda<Func<T, bool>>(body, parameter);
-        }
-
-        private Expression BuildMatrixExpression(QueryMatrix matrix, ParameterExpression parameter)
-        {
-            var expressions = new List<Expression>();
-
-            // Handle direct conditions
-            foreach (var condition in matrix.Conditions)
+            // Check for context values first
+            if (condition.Value.Value?.ToString()?.StartsWith(ContextPrefix) == true)
             {
-                if (typeof(Employee).IsAssignableFrom(parameter.Type))
-                {
-                    // Starting from Employee - handle metadata navigation
-                    expressions.Add(
-                        condition.Field.StartsWith(MetadataPrefix)
-                            ? BuildMetadataRelatedExpression(parameter, condition)
-                            : BuildSimpleExpression(parameter, condition));
-                }
-                else if (typeof(Metadata).IsAssignableFrom(parameter.Type))
-                {
-                    // Starting from Metadata - handle employee navigation
-                    expressions.Add(
-                        condition.Field.StartsWith(EmployeePrefix)
-                            ? BuildEmployeeRelatedExpression(parameter, condition)
-                            : BuildSimpleExpression(parameter, condition));
-                }
+                expressions.Add(BuildContextExpression(parameter, condition));
+                continue;
             }
 
-            // Handle nested matrices
-            foreach (var nested in matrix.NestedMatrices)
+            // Then handle metadata or employee conditions
+            if (condition.Field.StartsWith(MetadataPrefix))
             {
-                expressions.Add(BuildMatrixExpression(nested, parameter));
+                expressions.Add(BuildMetadataRelatedExpression(parameter, condition));
             }
-
-            return ExpressionBuilder.CombineConditions(expressions, matrix.LogicalOperator);
-        }
-
-        private Expression BuildSimpleExpression(ParameterExpression parameter, QueryCondition condition)
-        {
-            var property = Expression.Property(parameter, condition.Field);
-            var value = Expression.Constant(condition.Value.Value);
-            return ExpressionBuilder.BuildComparisonExpression(property, value, condition.Operator);
-        }
-
-        private Expression BuildMetadataRelatedExpression(ParameterExpression employeeParam, QueryCondition condition)
-        {
-            // Handle Employee -> Approvers -> Metadata path
-            var metadataKey = condition.Field.Substring(MetadataPrefix.Length);
-
-            // Create parameters for the navigation path
-            var approverParam = Expression.Parameter(typeof(Approver), "a");
-            var metadataParam = Expression.Parameter(typeof(Metadata), "m");
-
-            // Build m.Key == metadataKey
-            var keyEqual = Expression.Equal(
-                Expression.Property(metadataParam, nameof(Metadata.Key)),
-                Expression.Constant(metadataKey));
-
-            // Build value comparison
-            var valueProperty = Expression.Property(metadataParam, nameof(Metadata.Value));
-            var valueComparison = BuildMetadataValueComparison(valueProperty, condition);
-
-            // Combine key and value conditions
-            var metadataCondition = Expression.AndAlso(keyEqual, valueComparison);
-
-            // Build the nested Any expressions
-            // First Any: a.Metadata.Any(m => m.Key == key && <value comparison>)
-            var metadataAny = Expression.Call(
-                typeof(Enumerable),
-                nameof(Enumerable.Any),
-                new[] { typeof(Metadata) },
-                Expression.Property(approverParam, nameof(Approver.Metadata)),
-                Expression.Lambda<Func<Metadata, bool>>(metadataCondition, metadataParam));
-
-            // Second Any: e.Approvers.Any(a => a.Metadata.Any(...))
-            return Expression.Call(
-                typeof(Enumerable),
-                nameof(Enumerable.Any),
-                new[] { typeof(Approver) },
-                Expression.Property(employeeParam, nameof(Employee.Approvers)),
-                Expression.Lambda<Func<Approver, bool>>(metadataAny, approverParam));
-        }
-
-        private Expression BuildEmployeeRelatedExpression(ParameterExpression metadataParam, QueryCondition condition)
-        {
-            // Handle Metadata -> Approver -> Employee path
-            var employeeField = condition.Field.Substring(EmployeePrefix.Length);
-
-            // Build the navigation path to Employee
-            var approverProperty = Expression.Property(metadataParam, nameof(Metadata.Approver));
-            var employeeProperty = Expression.Property(approverProperty, nameof(Approver.Employee));
-
-            // Build the final property access and comparison
-            var targetProperty = Expression.Property(employeeProperty, employeeField);
-            var value = Expression.Constant(condition.Value.Value);
-
-            return ExpressionBuilder.BuildComparisonExpression(targetProperty, value, condition.Operator);
-        }
-
-        private Expression BuildMetadataValueComparison(Expression valueProperty, QueryCondition condition)
-        {
-            Expression compareValue;
-
-            // For numeric comparisons, parse both sides as decimal
-            if (condition.Operator.Value is "_gt" or "_lt" or "_gte" or "_lte")
+            else if (condition.Field.StartsWith(EmployeePrefix))
             {
-                var parseMethod = typeof(decimal).GetMethod(nameof(decimal.Parse), new[] { typeof(string) });
-                valueProperty = Expression.Call(parseMethod, valueProperty);
-                compareValue = Expression.Constant(decimal.Parse(condition.Value.Value.ToString()));
+                expressions.Add(BuildSimpleExpression(parameter, condition));
             }
-            else
-            {
-                compareValue = Expression.Constant(condition.Value.Value.ToString());
-            }
-
-            return ExpressionBuilder.BuildComparisonExpression(valueProperty, compareValue, condition.Operator);
         }
+
+        // Handle nested matrices
+        foreach (var nested in matrix.NestedMatrices)
+        {
+            expressions.Add(BuildMatrixExpression(nested, parameter));
+        }
+
+        return ExpressionBuilder.CombineConditions(expressions, matrix.LogicalOperator);
+    }
+
+    private Expression BuildSimpleExpression(
+        ParameterExpression parameter, 
+        QueryCondition condition)
+    {
+        // Strip off the "Employee." prefix to get just the property name
+        var propertyName = condition.Field.StartsWith(EmployeePrefix)
+            ? condition.Field[EmployeePrefix.Length..]
+            : condition.Field;
+
+        var property = Expression.Property(parameter, propertyName);
+        var value = Expression.Constant(condition.Value.Value);
+        return ExpressionBuilder.BuildComparisonExpression(property, value, condition.Operator);
+    }
+
+    private Expression BuildMetadataRelatedExpression(
+        ParameterExpression parameter, 
+        QueryCondition condition)
+    {
+        // Get the metadata key name (e.g., "FinancialLimit" from "ApproverMetadataKey.FinancialLimit")
+        var metadataKey = condition.Field[MetadataPrefix.Length..];
+
+        // Build navigation path
+        var approversProperty = Expression.Property(parameter, "Approvers");
+
+        // Build the metadata filter
+        var approverParam = Expression.Parameter(typeof(Approver), "a");
+        var metadataParam = Expression.Parameter(typeof(Metadata), "m");
+
+        // m.Key == metadataKey && <value comparison>
+        var keyEqual = Expression.Equal(
+            Expression.Property(metadataParam, "Key"),
+            Expression.Constant(metadataKey));
+
+        var valueProperty = Expression.Property(metadataParam, "Value");
+        var valueComparison = BuildMetadataValueComparison(valueProperty, condition);
+
+        var metadataCondition = Expression.AndAlso(keyEqual, valueComparison);
+
+        // Build the Any expressions for metadata
+        var metadataAny = Expression.Call(
+            typeof(Enumerable),
+            nameof(Enumerable.Any),
+            [typeof(Metadata)],
+            Expression.Property(approverParam, "Metadata"),
+            Expression.Lambda<Func<Metadata, bool>>(metadataCondition, metadataParam));
+
+        // Build the Any expression for approvers
+        return Expression.Call(
+            typeof(Enumerable),
+            nameof(Enumerable.Any),
+            [typeof(Approver)],
+            approversProperty,
+            Expression.Lambda<Func<Approver, bool>>(metadataAny, approverParam));
+    }
+
+    private Expression BuildContextExpression(
+        ParameterExpression parameter, 
+        QueryCondition condition)
+    {
+        // Parse the context path (e.g., "@Context.RequestedByTMID.ReportsTo")
+        var contextPath = condition.Value.Value.ToString()[ContextPrefix.Length..];
+        var parts = contextPath.Split('.');
+
+        // Use the actual context value passed in at runtime instead of a parameter
+        var contextValue = Expression.Constant(_context);
+
+        // If there's a property navigation (e.g., "ReportsTo")
+        if (parts.Length > 1)
+        {
+            var propertyName = parts[1].StartsWith(EmployeePrefix)
+                ? parts[1][EmployeePrefix.Length..]
+                : parts[1];
+
+            var propertyToCompare = Expression.Property(parameter, propertyName);
+
+            return ExpressionBuilder.BuildComparisonExpression(
+                propertyToCompare,
+                contextValue,
+                condition.Operator);
+        }
+
+        var fieldName = condition.Field.StartsWith(EmployeePrefix)
+            ? condition.Field.Substring(EmployeePrefix.Length)
+            : condition.Field;
+
+        var property = Expression.Property(parameter, fieldName);
+        return ExpressionBuilder.BuildComparisonExpression(
+            property,
+            contextValue,
+            condition.Operator);
+    }
+
+    private Expression BuildMetadataValueComparison(
+        Expression valueProperty, 
+        QueryCondition condition)
+    {
+        Expression compareValue;
+
+        // For numeric comparisons, parse both sides as decimal
+        if (condition.Operator.Value is "_gt" or "_lt" or "_gte" or "_lte")
+        {
+            var parseMethod = typeof(decimal).GetMethod(nameof(decimal.Parse), [typeof(string)]);
+            valueProperty = Expression.Call(parseMethod, valueProperty);
+            compareValue = Expression.Constant(decimal.Parse(condition.Value.Value.ToString()));
+        }
+        else
+        {
+            compareValue = Expression.Constant(condition.Value.Value.ToString());
+        }
+
+        return ExpressionBuilder.BuildComparisonExpression(valueProperty, compareValue, condition.Operator);
     }
 }
