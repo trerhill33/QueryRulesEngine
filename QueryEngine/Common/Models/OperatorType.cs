@@ -1,9 +1,8 @@
-﻿namespace QueryRulesEngine.QueryEngine.Common.Models
+﻿namespace QueryRulesEngine.QueryEngine.Common.Models;
+
+public enum OperatorType
 {
-    public enum OperatorType
-    {
-        Comparison,
-        Text,
-        Logical
-    }
+    Comparison,
+    Text,
+    Logical
 }

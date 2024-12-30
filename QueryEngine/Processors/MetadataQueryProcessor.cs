@@ -37,6 +37,8 @@ public class MetadataQueryProcessor : IMetadataQueryProcessor
         // Handle direct conditions (not nested)
         foreach (var condition in matrix.Conditions)
         {
+            ValidateCondition(condition);
+
             if (condition.Value.Value?.ToString()?.StartsWith(QueryPrefixes.Context) == true)
             {
                 expressions.Add(BuildContextExpression(parameter, condition));
@@ -171,5 +173,30 @@ public class MetadataQueryProcessor : IMetadataQueryProcessor
         }
 
         return ExpressionBuilder.BuildComparisonExpression(valueProperty, compareValue, condition.Operator);
+    }
+
+    private static void ValidateCondition(QueryCondition condition)
+    {
+        if (condition.Field.StartsWith(QueryPrefixes.Employee))
+        {
+            var propertyName = condition.Field[QueryPrefixes.Employee.Length..];
+            if (typeof(Employee).GetProperty(propertyName) == null)
+            {
+                throw new ArgumentException($"Employee does not contain a property named '{propertyName}'.");
+            }
+        }
+        else if (condition.Field.StartsWith(QueryPrefixes.Metadata))
+        {
+            // TODO: Place holder. Not sure if we need.
+            // What we are searchiang for is dynamic and lives as records in the table. Might be tricky and non performant. I see the value, but need to determine the impact. 
+        }
+        else
+        {
+            throw new ArgumentException($"Unsupported field prefix in '{condition.Field}'.");
+        }
+
+        // Validate operator
+        if (!QueryOperator.All.Contains(condition.Operator))
+            throw new ArgumentException($"Unsupported operator: {condition.Operator.Value}");
     }
 }

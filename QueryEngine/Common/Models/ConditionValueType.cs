@@ -1,9 +1,8 @@
-﻿namespace QueryRulesEngine.QueryEngine.Common.Models
+﻿namespace QueryRulesEngine.QueryEngine.Common.Models;
+
+public enum ConditionValueType
 {
-    public enum ConditionValueType
-    {
-        Single,
-        Pattern,
-        Array
-    }
+    Single,
+    Pattern,
+    Array
 }
