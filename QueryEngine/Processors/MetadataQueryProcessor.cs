@@ -9,6 +9,7 @@ namespace QueryRulesEngine.QueryEngine.Processors;
 public class MetadataQueryProcessor : IMetadataQueryProcessor
 {
     private string? _context;
+    private string? _hierarchyId;
 
     public Expression<Func<Employee, object>>[] GetRequiredIncludes() => [
         e => e.Approvers,
@@ -16,15 +17,18 @@ public class MetadataQueryProcessor : IMetadataQueryProcessor
     ];
 
     public Expression<Func<T, bool>> BuildExpressionFromQueryMatrix<T>(
-        QueryMatrix matrix, 
-        string context = "") 
+        QueryMatrix matrix,
+        string? hierarchyId = null,
+        string? context = null) 
         where T : class
     {
         ArgumentNullException.ThrowIfNull(matrix);
         _context = context;
+        _hierarchyId = hierarchyId;
 
         var parameter = Expression.Parameter(typeof(T), "x");
         var body = BuildMatrixExpression(matrix, parameter);
+
         return Expression.Lambda<Func<T, bool>>(body, parameter);
     }
 
@@ -108,6 +112,16 @@ public class MetadataQueryProcessor : IMetadataQueryProcessor
             Expression.Property(approverParam, "Metadata"),
             Expression.Lambda<Func<Metadata, bool>>(metadataCondition, metadataParam));
 
+        // Add hierarchy filter if hierarchyId is present
+        Expression approverCondition = metadataAny;
+        if (_hierarchyId != null)
+        {
+            var hierarchyIdProperty = Expression.Property(approverParam, "HierarchyId");
+            var hierarchyIdValue = Expression.Constant(int.Parse(_hierarchyId));
+            var hierarchyIdEqual = Expression.Equal(hierarchyIdProperty, hierarchyIdValue);
+            approverCondition = Expression.AndAlso(hierarchyIdEqual, metadataAny);
+        }
+
         // Build the Any expression for approvers
         return Expression.Call(
             typeof(Enumerable),
@@ -174,6 +188,9 @@ public class MetadataQueryProcessor : IMetadataQueryProcessor
 
         return ExpressionBuilder.BuildComparisonExpression(valueProperty, compareValue, condition.Operator);
     }
+
+    private Expression<Func<Employee, bool>> BuildHierarchyFilter(int hierarchyId) 
+        => e => e.Approvers.Any(a => a.HierarchyId == hierarchyId);
 
     private static void ValidateCondition(QueryCondition condition)
     {
