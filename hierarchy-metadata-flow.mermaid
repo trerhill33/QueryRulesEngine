@@ -1,0 +1,77 @@
+graph LR
+    subgraph Hierarchies[Hierarchies]
+        direction TB
+        H1[Manufacturing Hierarchy id: 1]
+        H2[Retail Hierarchy id: 2]
+    end
+
+    subgraph Keys[Metadata Keys]
+        direction TB
+        %% Manufacturing Keys
+        MK1A[FinancialLimit]
+        MK1B[BackupFor]
+        MK1C[Location]
+
+        %% Retail Keys
+        MK2A[FinancialLimit]
+        MK2B[BackupFor]
+        MK2C[Department]
+    end
+
+    subgraph MetadataValues[Metadata]
+        direction TB
+        %% Manufacturing metadata
+        M1A1[FinancialLimit: 25000]
+        M1A2[BackupFor: ANGIE_TMID]
+        M1A3[Location: TN]
+        
+        %% Retail metadata
+        M2A1[FinancialLimit: 10000]
+        M2A2[BackupFor: null]
+        M2A3[Department: Sales]
+    end
+
+    subgraph Records[Approvers and Employee]
+        direction TB
+        %% Approver records
+        A1[Approver Record HierarchyId: 1]
+        A2[Approver Record HierarchyId: 2]
+        
+        %% Employee at the end
+        E[Employee TMID: 331220 Name: John Doe Title: Manager]
+    end
+
+    %% Hierarchy to Key connections
+    H1 --> MK1A & MK1B & MK1C
+    H2 --> MK2A & MK2B & MK2C
+
+    %% Key to Metadata connections
+    MK1A --> M1A1
+    MK1B --> M1A2
+    MK1C --> M1A3
+    MK2A --> M2A1
+    MK2B --> M2A2
+    MK2C --> M2A3
+
+    %% Metadata to Approver connections
+    M1A1 & M1A2 & M1A3 --> A1
+    M2A1 & M2A2 & M2A3 --> A2
+
+    %% Approver to Employee connections
+    A1 --> E
+    A2 --> E
+
+    %% Styling
+    style H1 fill:#f96,stroke:#333
+    style H2 fill:#f96,stroke:#333
+    
+    style E fill:#f9f,stroke:#333
+    
+    style A1 fill:#bbf,stroke:#333
+    style A2 fill:#bbf,stroke:#333
+    
+    style MK1A,MK1B,MK1C fill:#9cf,stroke:#333
+    style MK2A,MK2B,MK2C fill:#9cf,stroke:#333
+    
+    style M1A1,M1A2,M1A3 fill:#dfd,stroke:#333
+    style M2A1,M2A2,M2A3 fill:#dfd,stroke:#333
