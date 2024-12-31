@@ -35,7 +35,7 @@ namespace QueryRulesEngine.Persistence
                 Succeeded = false
             };
             int num = 1;
-            List<string> list = new List<string>(num);
+            List<string> list = new(num);
             CollectionsMarshal.SetCount(list, num);
             Span<string> span = CollectionsMarshal.AsSpan(list);
             int num2 = 0;
@@ -87,7 +87,7 @@ namespace QueryRulesEngine.Persistence
                 Succeeded = true
             };
             int num = 1;
-            List<string> list = new List<string>(num);
+            List<string> list = new(num);
             CollectionsMarshal.SetCount(list, num);
             Span<string> span = CollectionsMarshal.AsSpan(list);
             int num2 = 0;
@@ -124,12 +124,12 @@ namespace QueryRulesEngine.Persistence
 
         public new static Result<T> Fail(string message, ResultStatus status = ResultStatus.Error)
         {
-            Result<T> obj = new Result<T>
+            Result<T> obj = new()
             {
                 Succeeded = false
             };
             int num = 1;
-            List<string> list = new List<string>(num);
+            List<string> list = new(num);
             CollectionsMarshal.SetCount(list, num);
             Span<string> span = CollectionsMarshal.AsSpan(list);
             int num2 = 0;
@@ -176,12 +176,12 @@ namespace QueryRulesEngine.Persistence
 
         public new static Result<T> Success(string message, ResultStatus status = ResultStatus.Success)
         {
-            Result<T> obj = new Result<T>
+            Result<T> obj = new()
             {
                 Succeeded = true
             };
             int num = 1;
-            List<string> list = new List<string>(num);
+            List<string> list = new(num);
             CollectionsMarshal.SetCount(list, num);
             Span<string> span = CollectionsMarshal.AsSpan(list);
             int num2 = 0;
@@ -204,13 +204,13 @@ namespace QueryRulesEngine.Persistence
 
         public static Result<T> Success(T data, string message, ResultStatus status = ResultStatus.Success)
         {
-            Result<T> obj = new Result<T>
+            Result<T> obj = new()
             {
                 Succeeded = true,
                 Data = data
             };
             int num = 1;
-            List<string> list = new List<string>(num);
+            List<string> list = new(num);
             CollectionsMarshal.SetCount(list, num);
             Span<string> span = CollectionsMarshal.AsSpan(list);
             int num2 = 0;
