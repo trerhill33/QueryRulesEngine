@@ -66,7 +66,7 @@ public sealed class GetRulesService(
             var (level, ruleNumber) = ParseRuleIdentifiers(key.KeyName);
             if (!level.HasValue || !ruleNumber.HasValue) continue;
 
-            var rule = await BuildHierarchyRule(key, level.Value, ruleNumber.Value, cancellationToken);
+            var rule = await BuildHierarchyRule(key,  ruleNumber.Value, cancellationToken);
             AddRuleToLevel(rulesByLevel, level.Value, rule);
         }
 
@@ -89,7 +89,6 @@ public sealed class GetRulesService(
 
     private async Task<HierarchyRule> BuildHierarchyRule(
         MetadataKey key,
-        int level,
         int ruleNumber,
         CancellationToken cancellationToken)
     {
@@ -99,8 +98,6 @@ public sealed class GetRulesService(
         {
             RuleNumber = ruleNumber,
             Configuration = await AnalyzeRuleConfiguration(queryMatrix, cancellationToken),
-            QueryMatrix = queryMatrix,
-            OriginalQuery = key.KeyName
         };
     }
 
@@ -132,25 +129,27 @@ public sealed class GetRulesService(
     private static IReadOnlyCollection<string> ExtractMetadataKeys(QueryMatrix matrix)
     {
         var keys = new HashSet<string>();
+        ExtractKeysRecursive(matrix, keys);
+        return [.. keys];
+    }
 
-        void ExtractKeys(QueryMatrix m)
+    private static void ExtractKeysRecursive(QueryMatrix matrix, HashSet<string> keys)
+    {
+        // Check conditions at current level
+        foreach (var condition in matrix.Conditions)
         {
-            foreach (var condition in m.Conditions)
+            if (condition.Field.StartsWith(RuleFieldPatterns.MetadataPrefix.ApproverMetadataKey))
             {
-                if (condition.Field.StartsWith(RuleFieldPatterns.MetadataPrefix.ApproverMetadataKey))
-                {
-                    keys.Add(condition.Field[RuleFieldPatterns.MetadataPrefix.ApproverMetadataKey.Length..]);
-                }
-            }
-
-            foreach (var nested in m.NestedMatrices)
-            {
-                ExtractKeys(nested);
+                var key = condition.Field.Replace(RuleFieldPatterns.MetadataPrefix.ApproverMetadataKey, "");
+                keys.Add(key);
             }
         }
 
-        ExtractKeys(matrix);
-        return [.. keys];
+        // Check nested matrices
+        foreach (var nested in matrix.NestedMatrices)
+        {
+            ExtractKeysRecursive(nested, keys);
+        }
     }
 
     private async Task<IReadOnlyCollection<CustomListApprover>> ExtractCustomListApprovers(
@@ -186,7 +185,7 @@ public sealed class GetRulesService(
         }
 
         await ExtractApprovers(matrix);
-        return approvers.ToList();
+        return [.. approvers];
     }
 
     private static IReadOnlyCollection<HierarchyLevel> BuildLevels(
