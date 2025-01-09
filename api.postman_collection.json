@@ -1,0 +1,675 @@
+{
+	"info": {
+		"_postman_id": "450efc4f-a350-4bf7-adad-10cf85443d74",
+		"name": "api",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "31844625"
+	},
+	"item": [
+		{
+			"name": "approvalhierarchymanager",
+			"item": [
+				{
+					"name": "v{{version}}",
+					"item": [
+						{
+							"name": "Tokens",
+							"item": [
+								{
+									"name": "Refresh Token",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n \"token\": \"<string>\",\n \"refreshToken\": \"<string>\"\n}"
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/{{appName}}/v{{version}}/Token/refresh",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"{{appName}}",
+												"v{{version}}",
+												"Token",
+												"refresh"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get Token",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n \"email\": \"systemuser@claytonhomes.com\",\n \"firstName\": \"System\",\n \"lastName\": \"User\"\n}"
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/{{appName}}/v{{version}}/Token",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"{{appName}}",
+												"v{{version}}",
+												"Token"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Retail + Corporate Hierarchy",
+							"item": [
+								{
+									"name": "Create Hierarchy",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"name\": \"Retail + Corporate\",\n  \"description\": \"Approval hierarchy for Retail and Corporate entities\",\n  \"tag\" : \"RetailCorporate\"\n}"
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/{{appName}}/v{{version}}/hierarchies",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"{{appName}}",
+												"v{{version}}",
+												"hierarchies"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Add Level 1 Rule",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"hierarchyId\": 1,\n  \"levelNumber\": 1,\n  \"ruleNumber\": \"1\",\n  \"queryMatrix\": {\n    \"logicalOperator\": \"_and\",\n    \"conditions\": [\n      {\n        \"field\": \"Employee.TMID\",\n        \"operator\": \"_eq\",\n        \"value\": {\n          \"value\": \"@Context.RequestedTMID.ReportsTo\",\n          \"type\": \"Single\"\n        }\n      }\n    ],\n    \"nestedMatrices\": []\n  }\n}"
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/{{appName}}/v{{version}}/rules",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"{{appName}}",
+												"v{{version}}",
+												"rules"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Add Level 2 Rule",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"hierarchyId\": 1,\n  \"levelNumber\": 2,\n  \"ruleNumber\": \"1\",\n  \"queryMatrix\": {\n    \"logicalOperator\": \"_and\",\n    \"conditions\": [\n      {\n        \"field\": \"Employee.TMID\",\n        \"operator\": \"_eq\",\n        \"value\": {\n          \"value\": \"MELISSA_TMID\",\n          \"type\": \"Single\"\n        }\n      }\n    ],\n    \"nestedMatrices\": []\n  }\n}"
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/{{appName}}/v{{version}}/rules",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"{{appName}}",
+												"v{{version}}",
+												"rules"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Add Approver",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"approvers\": [\n    {\n      \"tmid\": \"MELISSA_TMID\"\n    }\n  ]\n}"
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/{{appName}}/v{{version}}/hierarchies/:id/approvers",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"{{appName}}",
+												"v{{version}}",
+												"hierarchies",
+												":id",
+												"approvers"
+											],
+											"variable": [
+												{
+													"key": "id"
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"auth": {
+								"type": "noauth"
+							},
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"type": "text/javascript",
+										"packages": {},
+										"exec": [
+											""
+										]
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"packages": {},
+										"exec": [
+											""
+										]
+									}
+								}
+							]
+						},
+						{
+							"name": "HFA Hierarchy",
+							"item": [
+								{
+									"name": "Create Hierarchy",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"name\": \"HFA\",\n  \"description\": \"Approval hierarchy for HFA\",\n  \"tag\" : \"HFA\"\n\n}"
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/{{appName}}/v{{version}}/hierarchies",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"{{appName}}",
+												"v{{version}}",
+												"hierarchies"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Add Level 1 Rule",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"hierarchyId\": 2,\n  \"levelNumber\": 1,\n  \"ruleNumber\": \"1\",\n  \"queryMatrix\": {\n    \"logicalOperator\": \"_and\",\n    \"conditions\": [\n      {\n        \"field\": \"Employee.TMID\",\n        \"operator\": \"_eq\",\n        \"value\": {\n          \"value\": \"BILL_TMID\",\n          \"type\": \"Single\"\n        }\n      }\n    ],\n    \"nestedMatrices\": []\n  }\n}"
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/{{appName}}/v{{version}}/rules",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"{{appName}}",
+												"v{{version}}",
+												"rules"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Add Approver",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"approvers\": [\n    {\n      \"tmid\": \"BILL_TMID\"\n    }\n  ]\n}"
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/{{appName}}/v{{version}}/hierarchies/:id/approvers",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"{{appName}}",
+												"v{{version}}",
+												"hierarchies",
+												":id",
+												"approvers"
+											],
+											"variable": [
+												{
+													"key": "id"
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Vanderbilt Hierarchy",
+							"item": [
+								{
+									"name": "Create Hierarchy",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"name\": \"Vanderbilt\",\n  \"description\": \"Approval hierarchy for Vanderbilt\",\n   \"tag\" : \"Vanderbilt\"\n}"
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/{{appName}}/v{{version}}/hierarchies",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"{{appName}}",
+												"v{{version}}",
+												"hierarchies"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Add MetadataKeys",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"keys\": [\"Alternate\", \"Location\"]\n}"
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/{{appName}}/v{{version}}/hierarchies/:id/metadata-keys/sync",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"{{appName}}",
+												"v{{version}}",
+												"hierarchies",
+												":id",
+												"metadata-keys",
+												"sync"
+											],
+											"variable": [
+												{
+													"key": "id"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Add Approvers with Metadata",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"approvers\": [\n    {\n      \"tmid\": \"MICHELLE_TMID\",\n      \"Location\": \"Silverton\"\n    },\n    {\n      \"tmid\": \"BRAD_TMID\",\n      \"metadata\": {\n        \"Alternate\": \"MICHELLE_TMID\"\n      }\n    },\n    {\n      \"tmid\": \"ADELE_TMID\",\n      \"metadata\": {\n        \"Alternate\": \"MICHELLE_TMID\",\n        \"Location\": \"Silverton\"\n      }\n    }\n  ]\n}"
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/{{appName}}/v{{version}}/hierarchies/:id/approvers",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"{{appName}}",
+												"v{{version}}",
+												"hierarchies",
+												":id",
+												"approvers"
+											],
+											"variable": [
+												{
+													"key": "id"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Add Level 1 Rule",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"hierarchyId\": 3,\n  \"levelNumber\": 1,\n  \"ruleNumber\": \"1\",\n  \"queryMatrix\": {\n    \"logicalOperator\": \"_or\",\n    \"conditions\": [\n      {\n        \"field\": \"Employee.TMID\",\n        \"operator\": \"_eq\",\n        \"value\": {\n          \"value\": \"MICHELLE_TMID\",\n          \"type\": \"Single\"\n        }\n      }\n    ],\n    \"nestedMatrices\": [\n      {\n        \"logicalOperator\": \"_and\",\n        \"conditions\": [\n          {\n            \"field\": \"ApproverMetadataKey.Alternate\",\n            \"operator\": \"_eq\",\n            \"value\": {\n              \"value\": \"MICHELLE_TMID\",\n              \"type\": \"Single\"\n            }\n          }\n        ],\n        \"nestedMatrices\": []\n      }\n    ]\n  }\n}"
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/{{appName}}/v{{version}}/rules",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"{{appName}}",
+												"v{{version}}",
+												"rules"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Manufacturing Hierarchy",
+							"item": [
+								{
+									"name": "Create Hierarchy",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"name\": \"Manufacturing\",\n  \"description\": \"Approval hierarchy for Manufacturing, HBG, Clayton Supply/Heibar, CBG\",\n     \"tag\" : \"Manufacturing\"\n}"
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/{{appName}}/v{{version}}/hierarchies",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"{{appName}}",
+												"v{{version}}",
+												"hierarchies"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Add MetadataKeys",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"keys\": [\"Alternate\"]\n}"
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/{{appName}}/v{{version}}/hierarchies/:id/metadata-keys/sync",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"{{appName}}",
+												"v{{version}}",
+												"hierarchies",
+												":id",
+												"metadata-keys",
+												"sync"
+											],
+											"variable": [
+												{
+													"key": "id"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Add Approvers with Metadata",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"approvers\": [\n    {\n      \"tmid\": \"ANGIE_TMID\",\n      \"metadata\": {\n        \"FinancialLimit\": \"2500\"\n      }\n    },\n    {\n      \"tmid\": \"BROOKE_TMID\",\n      \"metadata\": {\n        \"BackupFor\": \"ANGIE_TMID\"\n      }\n    },\n    {\n      \"tmid\": \"CRYSTAL_TMID\",\n      \"metadata\": {\n        \"BackupFor\": \"ANGIE_TMID\"\n      }\n    }\n  ]\n}"
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/{{appName}}/v{{version}}/hierarchies/:id/approvers",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"{{appName}}",
+												"v{{version}}",
+												"hierarchies",
+												":id",
+												"approvers"
+											],
+											"variable": [
+												{
+													"key": "id"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Add Level 1 Rule",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"hierarchyId\": 4,\n  \"levelNumber\": 1,\n  \"ruleNumber\": \"1\",\n  \"queryMatrix\": {\n    \"logicalOperator\": \"_or\",\n    \"conditions\": [\n      {\n        \"field\": \"Employee.TMID\",\n        \"operator\": \"_eq\",\n        \"value\": {\n          \"value\": \"ANGIE_TMID\",\n          \"type\": \"Single\"\n        }\n      }\n    ],\n    \"nestedMatrices\": [\n      {\n        \"logicalOperator\": \"_and\",\n        \"conditions\": [\n          {\n            \"field\": \"ApproverMetadataKey.Alternate\",\n            \"operator\": \"_eq\",\n            \"value\": {\n              \"value\": \"ANGIE_TMID\",\n              \"type\": \"Single\"\n            }\n          }\n        ],\n        \"nestedMatrices\": []\n      }\n    ]\n  }\n}"
+										},
+										"url": {
+											"raw": "{{baseUrl}}/api/{{appName}}/v{{version}}/rules",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"api",
+												"{{appName}}",
+												"v{{version}}",
+												"rules"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"auth": {
+								"type": "noauth"
+							},
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"type": "text/javascript",
+										"packages": {},
+										"exec": [
+											""
+										]
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"packages": {},
+										"exec": [
+											""
+										]
+									}
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "basic"
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "https://localhost:60710",
+			"type": "string"
+		},
+		{
+			"key": "version",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "appName",
+			"value": "approvalhierarchymanager",
+			"type": "string"
+		}
+	]
+}
